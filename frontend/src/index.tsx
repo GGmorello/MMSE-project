@@ -3,19 +3,23 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { Provider } from "react-redux";
+import { store } from "store/store";
 
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+    document.getElementById("root") as HTMLElement,
 );
 root.render(
-  <React.StrictMode>
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-    />
+    <Provider store={store}>
+        <React.StrictMode>
+            <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+            />
 
-    <App />
-  </React.StrictMode>
+            <App />
+        </React.StrictMode>
+    </Provider>,
 );
 
 // If you want to start measuring performance in your app, pass a function
