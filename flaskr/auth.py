@@ -26,8 +26,8 @@ def register():
         if error is None:
             try:
                 db.execute(
-                    "INSERT INTO user (username, password) VALUES (?, ?)",
-                    (username, generate_password_hash(password)),
+                    "INSERT INTO user (username, password, role) VALUES (?, ?, ?)",
+                    (username, generate_password_hash(password), ),
                 )
                 db.commit()
             except db.IntegrityError:
@@ -59,7 +59,7 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            return redirect(url_for('index'))
+            return {"access_token": user['access_token'], "role": user["role"]}
 
         flash(error)
 
