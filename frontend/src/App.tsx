@@ -1,5 +1,3 @@
-/* eslint-disable comma-dangle */
-/* eslint-disable @typescript-eslint/comma-dangle */
 import React, { useState } from "react";
 import "./App.css";
 import { TextField, Typography } from "@mui/material";
@@ -8,6 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { loginUser } from "store/user/userSlice";
 import { AppDispatch, RootState } from "store/store";
+import { MessageType, User } from "model";
+import { addMessage } from "store/message/messageSlice";
 
 const App = (): JSX.Element => {
     const dispatch: AppDispatch = useDispatch();
@@ -32,7 +32,13 @@ const App = (): JSX.Element => {
     const handleLogin = (): void => {
         dispatch(loginUser({ username, password }))
             .then(unwrapResult)
-            .then((res) => {
+            .then((res: User) => {
+                dispatch(
+                    addMessage({
+                        type: MessageType.SUCCESS,
+                        message: `Login successful! Welcome ${res.username}`,
+                    }),
+                );
                 console.log("login res", res);
             })
             .catch((e) => {
@@ -85,7 +91,7 @@ const App = (): JSX.Element => {
     );
 };
 
-const styles: { [key: string]: React.CSSProperties; } = {
+const styles: { [key: string]: React.CSSProperties } = {
     textField: {
         marginTop: 20,
         backgroundColor: "white",

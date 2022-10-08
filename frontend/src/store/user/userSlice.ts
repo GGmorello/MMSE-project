@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import WebService from "logic/WebService";
 import { ResponseType } from "model/api";
+import { User, Response } from "model";
 
 // TODO: Refactor
 const APP_BASE_URL = "http://localhost:3000/";
@@ -17,7 +18,7 @@ export const loginUser = createAsyncThunk(
         // const rootState = thunkAPI.getState();
         console.log("login user thunk");
         const service: WebService = new WebService(APP_BASE_URL);
-        const response = await service.login(username, password);
+        const response: Response<User> = await service.login(username, password);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 return response.data;
