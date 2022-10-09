@@ -29,13 +29,16 @@ def create_app(test_config=None):
     def hello():
         return 'Hello, World!'
 
-    from . import db
-    db.init_app(app)
+    from flaskr import db
+    db.main()
 
-    from . import auth
+    from flaskr import auth
     app.register_blueprint(auth.bp)
 
+    from flaskr import api
+    app.register_blueprint(api.bp)
     return app
 
-
-    return app
+if __name__ == '__main__':
+    app = create_app()
+    app.run(debug=True)
