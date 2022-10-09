@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import WebService from "logic/WebService";
+import WebService from "components/common/WebService";
 import { ResponseType } from "model/api";
 import { User, Response } from "model";
 
@@ -34,13 +34,21 @@ export const loginUser = createAsyncThunk(
     },
 );
 
+// just created as a mock so other slices can react to logout
+export const logoutUser = createAsyncThunk(
+    "user/logout",
+    async (_: any, thunkAPI) => {
+        thunkAPI.fulfillWithValue("ok");
+    },
+);
+
 export interface UserState {
-    userData: Object;
+    userData: User | null;
     loading: "idle" | "pending" | "succeeded" | "failed";
 }
 
 export const initialState: UserState = {
-    userData: {},
+    userData: null,
     loading: "idle",
 };
 
@@ -48,12 +56,16 @@ export const userSlice = createSlice({
     name: "user",
     initialState,
     reducers: {
-        setUserData: (state, action: PayloadAction<Object>) => {
+        setUserData: (state, action: PayloadAction<User>) => {
             state.userData = action.payload;
         },
     },
     extraReducers: (builder) => {
         builder
+            .addCase(logoutUser.fulfilled, (state, action) => {
+                state.userData = null;
+                state.loading = "idle";
+            })
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.userData = action.payload;
                 state.loading = "succeeded";

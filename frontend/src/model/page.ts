@@ -1,0 +1,4 @@
+export enum Page {
+    HOME = "HOME",
+    SUBMIT_CLIENT_DETAILS = "SUBMIT_CLIENT_DETAILS",
+}
