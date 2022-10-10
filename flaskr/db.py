@@ -41,14 +41,14 @@ def init_app(app):
 
 def main():
     conn = create_connection()
-    with open('schema.sql') as f:
+    with open('flaskr/schema.sql') as f:
         conn.executescript(f.read())
 
 def create_connection():
     """ create a database connection to a SQLite database """
     conn = None
     try:
-        conn = sqlite3.connect('../instance/flaskr1.sqlite')
+        conn = sqlite3.connect('instance/flaskr1.sqlite')
         conn.row_factory = dict_factory
 
     except Error as e:
