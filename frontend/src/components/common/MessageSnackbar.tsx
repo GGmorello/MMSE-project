@@ -6,7 +6,7 @@ import { RootState } from "store/store";
 import { Message, MessageType } from "model";
 import { setMessages } from "store/message/messageSlice";
 
-export const MessageSnackbar = (): JSX.Element => {
+export const MessageSnackbar = (): JSX.Element | null => {
     const dispatch = useDispatch();
     const [currentMessage, setCurrentMessage] = useState<Message | null>(null);
 
@@ -48,6 +48,8 @@ export const MessageSnackbar = (): JSX.Element => {
         const updated = messages.slice(1);
         dispatch(setMessages(updated));
     };
+
+    if (currentMessage === null) return null;
 
     return (
         <Snackbar

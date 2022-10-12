@@ -2,7 +2,7 @@ import sqlite3
 import click
 
 from flask import current_app, g
-
+from sqlite3 import Error
 
 def get_db():
     if 'db' not in g:
@@ -37,3 +37,30 @@ def init_db_command():
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
+
+
+def main():
+    conn = create_connection()
+    with open('flaskr/schema.sql') as f:
+        conn.executescript(f.read())
+
+def create_connection():
+    """ create a database connection to a SQLite database """
+    conn = None
+    try:
+        conn = sqlite3.connect('instance/flaskr1.sqlite')
+        conn.row_factory = dict_factory
+
+    except Error as e:
+        print(e)
+    return conn.cursor()
+
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+
+if __name__ == '__main__':
+    main()

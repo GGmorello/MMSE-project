@@ -12,6 +12,9 @@ module.exports = {
     },
     plugins: ["react"],
     rules: {
+        "no-unused-vars": "warn",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "multiline-ternary": ["error", "never"],
         "space-before-function-paren": "off",
         "@typescript-eslint/space-before-function-paren": "off",
         "@typescript-eslint/member-delimiter-style": [

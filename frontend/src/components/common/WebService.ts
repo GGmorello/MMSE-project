@@ -6,15 +6,16 @@ import {
     ResponseType,
     ErrorResponse,
     User,
-    Role,
 } from "model";
+
+const APP_BASE_URL = "http://localhost:5000/";
 
 class WebService {
     private readonly instance: Axios;
 
-    constructor(baseUrl: string, token?: string) {
+    constructor(token?: string) {
         this.instance = axios.create({
-            baseURL: baseUrl,
+            baseURL: APP_BASE_URL,
             headers: {
                 Authorization: token,
             },
@@ -22,35 +23,19 @@ class WebService {
     }
 
     async login(username: string, password: string): Promise<Response<User>> {
-        // TODO: Remove mock API call
-        return await new Promise((resolve, reject) => {
-            setTimeout(() => {
-                const mockedUser: User = {
-                    id: "user1",
-                    role: Role.CUSTOMER_SERVICE,
-                    username,
-                    accessToken: "accesstoken1",
-                };
-                const response: SuccessResponse<User> = {
+        return await this.instance
+            .post("auth/login", {
+                username,
+                password,
+            })
+            .then((res: AxiosResponse<User>) => {
+                const resp: SuccessResponse<User> = {
                     type: ResponseType.SUCCESSFUL,
-                    data: mockedUser,
+                    data: res.data,
                 };
-                resolve(response);
-            }, 3000);
-        });
-        // return await this.instance
-        //     .post("user/auth", {
-        //         username,
-        //         password,
-        //     })
-        //     .then((res: AxiosResponse<Object>) => {
-        //         const resp: SuccesResponse<Object> = {
-        //             type: ResponseType.SUCCESSFUL,
-        //             data: res.data,
-        //         };
-        //         return resp;
-        //     })
-        //     .catch(this.createDefaultErrorResponse);
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
     }
 
     private createDefaultErrorResponse(
