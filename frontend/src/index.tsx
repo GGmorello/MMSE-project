@@ -4,21 +4,26 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
-import { store } from "store/store";
+import { store, persistedStore } from "store/store";
+import { MessageSnackbar } from "components/common/MessageSnackbar";
+import { PersistGate } from "redux-persist/integration/react";
 
 const root = ReactDOM.createRoot(
     document.getElementById("root") as HTMLElement,
 );
 root.render(
     <Provider store={store}>
-        <React.StrictMode>
-            <link
-                rel="stylesheet"
-                href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-            />
+        <PersistGate loading={null} persistor={persistedStore}>
+            <React.StrictMode>
+                <link
+                    rel="stylesheet"
+                    href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+                />
 
-            <App />
-        </React.StrictMode>
+                <App />
+                <MessageSnackbar />
+            </React.StrictMode>
+        </PersistGate>
     </Provider>,
 );
 
