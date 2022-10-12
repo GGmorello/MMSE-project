@@ -3,9 +3,6 @@ import WebService from "components/common/WebService";
 import { ResponseType } from "model/api";
 import { User, Response } from "model";
 
-// TODO: Refactor
-const APP_BASE_URL = "http://localhost:3000/";
-
 interface LoginRequest {
     username: string;
     password: string;
@@ -14,10 +11,7 @@ interface LoginRequest {
 export const loginUser = createAsyncThunk(
     "user/login",
     async ({ username, password }: LoginRequest, thunkAPI) => {
-        // TODO: Use token from state in other requests?
-        // const rootState = thunkAPI.getState();
-        console.log("login user thunk");
-        const service: WebService = new WebService(APP_BASE_URL);
+        const service: WebService = new WebService();
         const response: Response<User> = await service.login(username, password);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:

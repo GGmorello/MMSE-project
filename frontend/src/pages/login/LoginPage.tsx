@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import "./Login.css";
-import { FormControl, TextField, Typography } from "@mui/material";
+import {
+    FormControl,
+    IconButton,
+    InputAdornment,
+    OutlinedInput,
+    Typography,
+} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useDispatch, useSelector } from "react-redux";
 import { unwrapResult } from "@reduxjs/toolkit";
@@ -8,6 +14,8 @@ import { loginUser } from "store/user/userSlice";
 import { AppDispatch, RootState } from "store/store";
 import { MessageType, User } from "model";
 import { addMessage } from "store/message/messageSlice";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const LoginPage = (): JSX.Element => {
     const dispatch: AppDispatch = useDispatch();
@@ -16,6 +24,7 @@ const LoginPage = (): JSX.Element => {
 
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const isLoading = loading === "pending";
 
@@ -29,6 +38,10 @@ const LoginPage = (): JSX.Element => {
         setPassword(e.target.value);
     };
 
+    const handleClickShowPassword = (): void => {
+        setShowPassword(!showPassword);
+    };
+
     const handleLogin = (): void => {
         if (!canLogin) return;
         dispatch(loginUser({ username, password }))
@@ -40,10 +53,15 @@ const LoginPage = (): JSX.Element => {
                         message: `Login successful! Welcome ${res.username}`,
                     }),
                 );
-                console.log("login res", res);
             })
             .catch((e) => {
-                console.log("login err", e);
+                dispatch(
+                    addMessage({
+                        type: MessageType.ERROR,
+                        message: "Login failed unexpectely, please try again. ",
+                    }),
+                );
+                console.log("login failed", e);
             });
     };
 
@@ -58,23 +76,44 @@ const LoginPage = (): JSX.Element => {
                         <Typography variant="body1">Sign in</Typography>
                     </div>
                     <FormControl onSubmit={handleLogin}>
-                        <div>
-                            <TextField
-                                label="Username"
+                        <FormControl
+                            sx={{ m: 1, width: "15ch" }}
+                            variant="outlined"
+                        >
+                            <OutlinedInput
                                 style={styles.textField}
+                                placeholder="Username"
                                 value={username}
                                 onChange={handleUsernameChanged}
                             />
-                        </div>
-                        <div>
-                            <TextField
-                                label="Password"
-                                type="password"
+                        </FormControl>
+                        <FormControl
+                            sx={{ m: 1, width: "15ch" }}
+                            variant="outlined"
+                        >
+                            <OutlinedInput
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Password"
                                 style={styles.textField}
                                 value={password}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword}
+                                            edge="end"
+                                        >
+                                            {showPassword ? (
+                                                <VisibilityOff />
+                                            ) : (
+                                                <Visibility />
+                                            )}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
                                 onChange={handlePasswordChanged}
                             />
-                        </div>
+                        </FormControl>
                     </FormControl>
                     <div style={{ marginTop: 20 }}>
                         <LoadingButton

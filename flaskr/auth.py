@@ -3,6 +3,7 @@ import functools
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, Response
 )
+from flask_cors import cross_origin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flaskr.db import create_connection
@@ -14,6 +15,7 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @bp.route('/register', methods=('GET', 'POST'))
+@cross_origin()
 def register():
     if request.method == 'POST':
         username = request.form['username']
@@ -44,6 +46,7 @@ def register():
 
 
 @bp.route('/login', methods=('GET', 'POST'))
+@cross_origin()
 def login():
     if request.method == 'POST':
         username = request.json['username']

@@ -20,7 +20,7 @@ export const Home = (): JSX.Element => {
 
     const [value, setValue] = useState<Page>(Page.HOME);
 
-    const handleChange = (event: any, newValue: any): any => {
+    const handleChange = (_event: React.SyntheticEvent, newValue: any): any => {
         setValue(newValue);
     };
 
@@ -80,21 +80,25 @@ export const Home = (): JSX.Element => {
         );
     }
 
-    console.log(userRoutes);
-
     return (
-        <div style={{ display: "flex", flexDirection: "row", width: "60vw" }}>
-            <div style={{ flex: 1 }}>
-                <TabContext value={value}>
+        <div style={{ width: "60vw" }}>
+            <TabContext value={value}>
+                <div
+                    style={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "row",
+                    }}
+                >
                     <Box
                         sx={{
+                            flex: 1,
                             borderBottom: 1,
                             borderColor: "divider",
                         }}
                     >
                         <TabList
                             onChange={handleChange}
-                            aria-label="lab API tabs example"
                             textColor="primary"
                             indicatorColor="primary"
                         >
@@ -124,9 +128,36 @@ export const Home = (): JSX.Element => {
                             })}
                         </TabList>
                     </Box>
+
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}
+                    >
+                        <div
+                            style={{ flex: 1, marginLeft: 10, marginRight: 10 }}
+                        >
+                            <Typography
+                                variant="subtitle1"
+                                sx={{ color: "lightblue" }}
+                            >
+                                Logged in as &quot;{user.username}&quot;
+                            </Typography>
+                        </div>
+                        <div>
+                            <Button variant="contained" onClick={handleLogout}>
+                                Logout
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+                <div>
                     <TabPanel value={Page.HOME}>
                         <Typography variant="h3" color={"white"}>
-                            Welcome, Home {user.username}!
+                            Welcome, {user.username}!
                         </Typography>
                     </TabPanel>
                     {userRoutes.map((route: Page) => {
@@ -136,13 +167,8 @@ export const Home = (): JSX.Element => {
                             </TabPanel>
                         );
                     })}
-                </TabContext>
-            </div>
-            <div>
-                <Button variant="contained" onClick={handleLogout}>
-                    Logout
-                </Button>
-            </div>
+                </div>
+            </TabContext>
         </div>
     );
 };
