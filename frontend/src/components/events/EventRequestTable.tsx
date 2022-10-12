@@ -1,9 +1,14 @@
-import { LoadingButton } from "@mui/lab";
-import { Typography } from "@mui/material";
+import {
+    Button,
+    FormControl,
+    InputLabel,
+    OutlinedInput,
+    Typography,
+} from "@mui/material";
 import { DataGrid, GridColumns, GridValueGetterParams } from "@mui/x-data-grid";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { getEventStatusLabel } from "logic/event";
-import { canEditEvents } from "logic/user";
+import { canAddReviewComments, canEditEvents } from "logic/user";
 import { Event, EventStatus, LoadingState, MessageType, User } from "model";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,6 +36,7 @@ const columns: GridColumns<Event> = [
     {
         field: "status",
         headerName: "Status",
+        width: 150,
         valueGetter: (params: GridValueGetterParams<Event>) => {
             return getEventStatusLabel(params.row.status);
         },
@@ -42,21 +48,27 @@ export const EventRequestTable = ({
 }: EventRequestTableProps): JSX.Element => {
     const dispatch: AppDispatch = useDispatch();
     const [selectedRow, setSelectedRow] = useState<Event | null>(null);
+    const [reviewComment, setReviewComment] = useState<string | null>(null);
 
     const user: User | null = useSelector(
         (state: RootState) => state.user.userData,
     );
-    const loadingState: LoadingState = useSelector((state: RootState) => state.event.loading);
+    const loadingState: LoadingState = useSelector(
+        (state: RootState) => state.event.loading,
+    );
     const loading: boolean = loadingState === LoadingState.PENDING;
 
     const handleGetRowId = (event: Event): string => event.id;
     const canEditRows: boolean = user !== null && canEditEvents(user.role);
+    const canAddComments: boolean =
+        user !== null && canAddReviewComments(user.role);
 
     const handleUpdateEvent = (id: string, status: EventStatus): void => {
         dispatch(
             updateEventStatus({
                 id,
                 status,
+                comment: reviewComment,
             }),
         )
             .then(unwrapResult)
@@ -71,6 +83,7 @@ export const EventRequestTable = ({
                 dispatch(fetchEvents(""))
                     .then(console.log.bind(this))
                     .catch(console.log.bind(this));
+                setSelectedRow(null);
             })
             .catch((e) => {
                 console.warn("Updating event status failed unexpectedly", e);
@@ -81,7 +94,6 @@ export const EventRequestTable = ({
                     }),
                 );
             });
-        setSelectedRow(null);
     };
 
     const handleApproveRequest = (): void => {
@@ -120,29 +132,46 @@ export const EventRequestTable = ({
                     <Typography variant="h4">Event Requests items</Typography>
                     <div style={{ height: 400, width: "100%" }}>
                         <EventRequestItemTable
-                            items={selectedRow?.eventRequestItems}
+                            items={selectedRow.eventRequestItems}
                         />
                     </div>
                     {canEditRows && (
-                        <div>
-                            <LoadingButton
-                                variant="contained"
-                                color="warning"
-                                loading={loading}
-                                style={styles.buttonStyle}
-                                onClick={handleRejectRequest}
-                            >
-                                Reject request
-                            </LoadingButton>
-                            <LoadingButton
-                                variant="contained"
-                                color="primary"
-                                loading={loading}
-                                style={styles.buttonStyle}
-                                onClick={handleApproveRequest}
-                            >
-                                Approve request
-                            </LoadingButton>
+                        <div style={{ marginTop: 10 }}>
+                            {canAddComments && (
+                                <FormControl style={{ width: "30ch" }}>
+                                    <InputLabel htmlFor={"review-input"}>
+                                        Review comment
+                                    </InputLabel>
+                                    <OutlinedInput
+                                        id="review-input"
+                                        value={reviewComment ?? ""}
+                                        label="Review comment"
+                                        onChange={(e) =>
+                                            setReviewComment(e.target.value)
+                                        }
+                                    />
+                                </FormControl>
+                            )}
+                            <div>
+                                <Button
+                                    variant="contained"
+                                    color="warning"
+                                    disabled={loading}
+                                    style={styles.buttonStyle}
+                                    onClick={handleRejectRequest}
+                                >
+                                    Reject request
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    disabled={loading}
+                                    style={styles.buttonStyle}
+                                    onClick={handleApproveRequest}
+                                >
+                                    Approve request
+                                </Button>
+                            </div>
                         </div>
                     )}
                 </div>

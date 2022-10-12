@@ -76,9 +76,10 @@ class WebService {
     async updateEventStatus(
         id: string,
         status: EventStatus,
+        comment: string | null,
     ): Promise<Response<Event>> {
         return await this.instance
-            .put<Event>("event/approve", { id, status })
+            .put<Event>("event/approve", { id, status, comment })
             .then((res: AxiosResponse<Event>) => {
                 const resp: SuccessResponse<Event> = {
                     type: ResponseType.SUCCESSFUL,

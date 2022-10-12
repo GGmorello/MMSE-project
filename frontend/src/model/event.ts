@@ -19,4 +19,5 @@ export interface EventBase {
 export interface Event extends EventBase {
     id: string;
     status: EventStatus;
+    reviewComments: string | null;
 }
