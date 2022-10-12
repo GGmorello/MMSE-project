@@ -15,7 +15,6 @@ const App = (): JSX.Element => {
         (state: RootState) => state.user.userData,
     );
     const loggedIn = user !== null;
-    console.log("logged in", loggedIn);
 
     if (!loggedIn) {
         return <LoginPage />;

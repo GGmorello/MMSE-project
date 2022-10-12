@@ -3,6 +3,12 @@ export interface EventRequestItem {
     description: string;
 }
 
+export enum EventStatus {
+    APPROVED_BY_SCSO = "APPROVED_BY_SCSO",
+    NEW = "NEW",
+    REJECTED_BY_SCSO = "REJECTED_BY_SCSO",
+}
+
 export interface EventBase {
     clientId: string;
     startDate: string; // YYYY-MM-DD
@@ -11,5 +17,6 @@ export interface EventBase {
 }
 
 export interface Event extends EventBase {
-    eventId: string;
+    id: string;
+    status: EventStatus;
 }

@@ -6,7 +6,7 @@ import {
     OutlinedInput,
     Typography,
 } from "@mui/material";
-import { EventRequestTable } from "components/events/EventRequestTable";
+import { EventRequestItemTable } from "components/events/EventRequestItemTable";
 import { isValid } from "date-fns";
 import { createDefaultEvent } from "logic/event";
 import { EventBase, EventRequestItem, LoadingState, MessageType } from "model";
@@ -230,7 +230,7 @@ export const SubmitEventRequest = (): JSX.Element => {
                             </div>
                         </div>
                         <div style={{ marginTop: 10, marginBottom: 10 }}>
-                            <EventRequestTable
+                            <EventRequestItemTable
                                 items={newEvent.eventRequestItems}
                                 onRowsUpdated={(rows: EventRequestItem[]) =>
                                     changeValue("eventRequestItems", rows)
