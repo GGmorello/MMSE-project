@@ -30,7 +30,7 @@ export const EventRequestItemTable = ({
     const editRowsEnabled: boolean = onRowsUpdated !== undefined;
 
     useEffect(() => {
-        setRows(items.sort((a, b) => a.requestId - b.requestId));
+        setRows([...items].sort((a, b) => a.requestId - b.requestId));
     }, [items]);
 
     const handleSelectionChanged = (

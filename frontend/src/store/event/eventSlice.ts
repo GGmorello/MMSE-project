@@ -72,11 +72,12 @@ export const fetchEvents = createAsyncThunk(
 export interface EventStatusUpdateRequest {
     id: string;
     status: EventStatus;
+    comment: string | null;
 }
 
 export const updateEventStatus = createAsyncThunk(
     "event/status",
-    async ({ id, status }: EventStatusUpdateRequest, thunkAPI) => {
+    async ({ id, status, comment }: EventStatusUpdateRequest, thunkAPI) => {
         const state: RootState = thunkAPI.getState() as RootState;
         const user: User | null = state.user.userData;
         if (user === null) {
@@ -84,7 +85,7 @@ export const updateEventStatus = createAsyncThunk(
             return thunkAPI.rejectWithValue("user is null");
         }
         const service: WebService = new WebService(user.access_token);
-        const response: Response<Event> = await service.updateEventStatus(id, status);
+        const response: Response<Event> = await service.updateEventStatus(id, status, comment);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 return response.data;
