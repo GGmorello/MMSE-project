@@ -49,6 +49,8 @@ def retrieve():
         statuses = "NEW"
     elif role == "FINANCIAL_MANAGER":
         statuses = "APPROVED_BY_SCSO"
+    elif role == "ADMINISTRATION_MANAGER":
+        statuses = "APPROVED_BY_FM"
 
     if statuses is None:
         return Response("Unauthorized", status=403)
@@ -68,8 +70,9 @@ def approve():
 
     user, db = init(request)
 
-    status = None
+    newStatus = None
     comment = None
+    approved = request.json["approved"]
 
     if user is None:
         return Response("Invalid user", status=400)
@@ -80,25 +83,44 @@ def approve():
 
     if event is None:
         return Response("Bad request - id invalid", status=400)
+
+    role = user['role']
+    status = event['status']
     
-    if user['role'] == "SENIOR_CUSTOMER_SERVICE_OFFICER":
-        if (event['status'] != 'NEW'):
+    if role == "SENIOR_CUSTOMER_SERVICE_OFFICER":
+        if (status != 'NEW'):
             return Response("Unauthorized - current event status is not 'NEW'", status=403)
 
-        status = "APPROVED_BY_SCSO"
+        if approved == True:
+            newStatus = "APPROVED_BY_SCSO"
+        else:
+            newStatus = "REJECTED_BY_SCSO"
 
-    elif user['role'] == "FINANCIAL_MANAGER":
-        if (event['status'] != 'APPROVED_BY_SCSO'):
+    elif role == "FINANCIAL_MANAGER":
+        if (status != 'APPROVED_BY_SCSO'):
             return Response("Unauthorized - current event status is not 'APPROVED_BY_SCSO'", status=403)
 
-        status = "APPROVED_BY_FM"
+        if approved == True:
+            newStatus = "APPROVED_BY_FM"
+        else:
+            newStatus = "REJECTED_BY_FM"
+        comment = request.json["comment"]
+    
+    elif role == "ADMINISTRATION_MANAGER":
+        if (status != 'APPROVED_BY_FM'):
+            return Response("Unauthorized - current event status is not 'APPROVED_BY_FM'", status=403)
+        
+        if approved == True:
+            newStatus = "APPROVED_BY_ADM"
+        else:
+            newStatus = "REJECTED_BY_ADM"
         comment = request.json["comment"]
 
-    if status is None:
+    if newStatus is None:
         return Response("Unauthorized", 403)
 
     db.cursor().execute(
-        'UPDATE event SET status = ?, reviewNotes = ? WHERE id = ?', (status, comment, id,)
+        'UPDATE event SET status = ?, reviewNotes = ? WHERE id = ?', (newStatus, comment, id,)
     )
     db.commit()
     event = db.execute('SELECT * FROM event WHERE id = ?', (id,)).fetchone()
