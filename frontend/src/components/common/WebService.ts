@@ -1,6 +1,13 @@
 import axios, { Axios, AxiosResponse } from "axios";
 
-import { Response, SuccessResponse, ResponseType, ErrorResponse } from "model";
+import {
+    Response,
+    SuccessResponse,
+    ResponseType,
+    ErrorResponse,
+    User,
+    Role,
+} from "model";
 
 class WebService {
     private readonly instance: Axios;
@@ -14,19 +21,25 @@ class WebService {
         });
     }
 
-    async login(username: string, password: string): Promise<Response<Object>> {
+    async login(username: string, password: string): Promise<Response<User>> {
         // TODO: Remove mock API call
         return await new Promise((resolve, reject) => {
             setTimeout(() => {
-                const response: SuccessResponse<Object> = {
+                const mockedUser: User = {
+                    id: "user1",
+                    role: Role.CUSTOMER_SERVICE,
+                    username,
+                    accessToken: "accesstoken1",
+                };
+                const response: SuccessResponse<User> = {
                     type: ResponseType.SUCCESSFUL,
-                    data: { name: "hello", surname: "world" },
+                    data: mockedUser,
                 };
                 resolve(response);
             }, 3000);
         });
         // return await this.instance
-        //     .post("/v1/user/authenticate", {
+        //     .post("user/auth", {
         //         username,
         //         password,
         //     })
