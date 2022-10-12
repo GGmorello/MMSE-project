@@ -4,12 +4,14 @@ import string
 from flask import (
     Blueprint, request, Response
 )
+from flask_cors import cross_origin
 
 from flaskr.db import create_connection
 
 bp = Blueprint('event', __name__, url_prefix='/event')
 
 @bp.route("/create", methods=['POST'])
+@cross_origin()
 def new_event():
 
     user, db = init(request)
@@ -29,10 +31,11 @@ def new_event():
         return event
 
     else:
-        return Response("Error", status=403)
+        return Response("Unauthorized", status=403)
 
 
 @bp.route('', methods=['GET'])
+@cross_origin()
 def retrieve():
 
     user, db = init(request)
@@ -50,10 +53,11 @@ def retrieve():
 
         return event
     else:
-        return Response("Error", status=400)
+        return Response("Unauthorized", status=403)
 
 
 @bp.route("/approve", methods=['PUT'])
+@cross_origin()
 def approve():
 
     user, db = init(request)

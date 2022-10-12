@@ -6,6 +6,8 @@ import {
     ResponseType,
     ErrorResponse,
     User,
+    Event,
+    EventBase,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -36,6 +38,22 @@ class WebService {
                 return resp;
             })
             .catch(this.createDefaultErrorResponse);
+    }
+
+    async createEvent(event: EventBase): Promise<Response<Event>> {
+        return await this.instance.post<Event>(
+            "event/create", {
+                clientId: event.clientId,
+                startDate: event.startDate,
+                endDate: event.endDate,
+                eventRequestItems: event.eventRequestItems,
+            }).then((res: AxiosResponse<Event>) => {
+            const resp: SuccessResponse<Event> = {
+                type: ResponseType.SUCCESSFUL,
+                data: res.data,
+            };
+            return resp;
+        }).catch(this.createDefaultErrorResponse);
     }
 
     private createDefaultErrorResponse(

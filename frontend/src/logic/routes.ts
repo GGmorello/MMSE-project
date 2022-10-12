@@ -3,7 +3,7 @@ import { Role, Page } from "model";
 export function getRoleRoutes(role: Role): Page[] {
     switch (role) {
         case Role.CUSTOMER_SERVICE:
-            return [Page.SUBMIT_CLIENT_DETAILS];
+            return [Page.SUBMIT_EVENT_REQUEST];
         default:
             console.warn(
                 "Unexpected role received, cannot calculate routes.",
@@ -15,8 +15,8 @@ export function getRoleRoutes(role: Role): Page[] {
 
 export function getRouteLabel(page: Page): string {
     switch (page) {
-        case Page.SUBMIT_CLIENT_DETAILS:
-            return "Submit client details";
+        case Page.SUBMIT_EVENT_REQUEST:
+            return "Submit event request";
         default:
             console.warn(
                 "Unexpected page received, cannot calculate route label:",
