@@ -104,7 +104,7 @@ def approve():
             newStatus = "APPROVED_BY_FM"
         else:
             newStatus = "REJECTED_BY_FM"
-        comment = request.json["comment"]
+        comment = request.json["reviewNotes"]
     
     elif role == "ADMINISTRATION_MANAGER":
         if (status != 'APPROVED_BY_FM'):
@@ -114,7 +114,7 @@ def approve():
             newStatus = "APPROVED_BY_ADM"
         else:
             newStatus = "REJECTED_BY_ADM"
-        comment = request.json["comment"]
+        comment = request.json["reviewNotes"]
 
     if newStatus is None:
         return Response("Unauthorized", 403)
