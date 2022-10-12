@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import WebService from "components/common/WebService";
 import { ResponseType } from "model/api";
-import { User, Response } from "model";
+import { User, Response, LoadingState } from "model";
 
 interface LoginRequest {
     username: string;
@@ -38,12 +38,12 @@ export const logoutUser = createAsyncThunk(
 
 export interface UserState {
     userData: User | null;
-    loading: "idle" | "pending" | "succeeded" | "failed";
+    loading: LoadingState;
 }
 
 export const initialState: UserState = {
     userData: null,
-    loading: "idle",
+    loading: LoadingState.IDLE,
 };
 
 export const userSlice = createSlice({
@@ -56,19 +56,19 @@ export const userSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(logoutUser.fulfilled, (state, action) => {
+            .addCase(logoutUser.fulfilled, (state: UserState) => {
                 state.userData = null;
-                state.loading = "idle";
+                state.loading = LoadingState.IDLE;
             })
-            .addCase(loginUser.fulfilled, (state, action) => {
+            .addCase(loginUser.fulfilled, (state: UserState, action) => {
                 state.userData = action.payload;
-                state.loading = "succeeded";
+                state.loading = LoadingState.SUCCEEDED;
             })
-            .addCase(loginUser.pending, (state) => {
-                state.loading = "pending";
+            .addCase(loginUser.pending, (state: UserState) => {
+                state.loading = LoadingState.PENDING;
             })
-            .addCase(loginUser.rejected, (state) => {
-                state.loading = "failed";
+            .addCase(loginUser.rejected, (state: UserState) => {
+                state.loading = LoadingState.FAILED;
             });
     },
 });

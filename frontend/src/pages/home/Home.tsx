@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addMessage } from "store/message/messageSlice";
 import { AppDispatch, RootState } from "store/store";
 import { logoutUser } from "store/user/userSlice";
-import { SubmitClientDetails } from "./submitClientDetails/SubmitClientDetails";
+import { SubmitEventRequest } from "./submitEventRequest/SubmitEventRequest";
 
 export const Home = (): JSX.Element => {
     const dispatch: AppDispatch = useDispatch();
@@ -57,8 +57,8 @@ export const Home = (): JSX.Element => {
 
     const getRouteComponent = (page: Page): JSX.Element => {
         switch (page) {
-            case Page.SUBMIT_CLIENT_DETAILS:
-                return <SubmitClientDetails />;
+            case Page.SUBMIT_EVENT_REQUEST:
+                return <SubmitEventRequest />;
             default:
                 console.warn(
                     "Unexpected page received, cannot calculate correct page component",
@@ -88,6 +88,7 @@ export const Home = (): JSX.Element => {
                         flex: 1,
                         display: "flex",
                         flexDirection: "row",
+                        backgroundColor: "#282c34",
                     }}
                 >
                     <Box
@@ -99,6 +100,8 @@ export const Home = (): JSX.Element => {
                     >
                         <TabList
                             onChange={handleChange}
+                            variant="scrollable"
+                            scrollButtons="auto"
                             textColor="primary"
                             indicatorColor="primary"
                         >
