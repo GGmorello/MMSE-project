@@ -43,18 +43,24 @@ def retrieve():
     if user is None:
         return Response("Invalid user", status=400)
 
-    elif user['role'] == "SENIOR_CUSTOMER_SERVICE_OFFICER":
-        event = db.cursor().execute(
-            'SELECT * FROM event WHERE status = ?', ("NEW",)
-        ).fetchall()
+    statuses = None
+    role = user['role']
+    if role == "SENIOR_CUSTOMER_SERVICE_OFFICER":
+        statuses = "NEW"
+    elif role == "FINANCIAL_MANAGER":
+        statuses = "APPROVED_BY_SCSO"
 
-        for e in event:
-            e['eventRequestItems'] = eval(e['eventRequestItems'])
-
-        return event
-    else:
+    if statuses is None:
         return Response("Unauthorized", status=403)
+    
+    event = db.cursor().execute(
+        'SELECT * FROM event WHERE status IN (?)', (statuses,),
+    ).fetchall()
 
+    for e in event:
+        e['eventRequestItems'] = eval(e['eventRequestItems'])
+
+    return event
 
 @bp.route("/approve", methods=['PUT'])
 @cross_origin()
@@ -62,18 +68,42 @@ def approve():
 
     user, db = init(request)
 
+    status = None
+    comment = None
+
     if user is None:
         return Response("Invalid user", status=400)
 
-    elif user['role'] == "SENIOR_CUSTOMER_SERVICE_OFFICER":
-        db.cursor().execute(
-            'UPDATE event SET status = ? WHERE id = ?', (request.json['status'], request.json['id'],)
-        )
-        db.commit()
-        event = db.execute('SELECT * FROM event WHERE id = ?', (request.json['id'],)).fetchone()
-        event['eventRequestItems'] = eval(event['eventRequestItems'])
-        return event
+    id = request.json["id"]
+    
+    event = db.execute('SELECT * FROM event WHERE id = ?', (id,)).fetchone()
 
+    if event is None:
+        return Response("Bad request - id invalid", status=400)
+    
+    if user['role'] == "SENIOR_CUSTOMER_SERVICE_OFFICER":
+        if (event['status'] != 'NEW'):
+            return Response("Unauthorized - current event status is not 'NEW'", status=403)
+
+        status = "APPROVED_BY_SCSO"
+
+    elif user['role'] == "FINANCIAL_MANAGER":
+        if (event['status'] != 'APPROVED_BY_SCSO'):
+            return Response("Unauthorized - current event status is not 'APPROVED_BY_SCSO'", status=403)
+
+        status = "APPROVED_BY_FM"
+        comment = request.json["comment"]
+
+    if status is None:
+        return Response("Unauthorized", 403)
+
+    db.cursor().execute(
+        'UPDATE event SET status = ?, reviewNotes = ? WHERE id = ?', (status, comment, id,)
+    )
+    db.commit()
+    event = db.execute('SELECT * FROM event WHERE id = ?', (id,)).fetchone()
+    event['eventRequestItems'] = eval(event['eventRequestItems'])
+    return event
 
 def init(req):
     token = req.headers['Authorization']
