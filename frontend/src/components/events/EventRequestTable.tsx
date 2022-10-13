@@ -9,7 +9,7 @@ import { DataGrid, GridColumns, GridValueGetterParams } from "@mui/x-data-grid";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { getEventStatusLabel } from "logic/event";
 import { canAddReviewComments, canEditEvents } from "logic/user";
-import { Event, EventStatus, LoadingState, MessageType, User } from "model";
+import { Event, LoadingState, MessageType, User } from "model";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEvents, updateEventStatus } from "store/event/eventSlice";
@@ -48,7 +48,7 @@ export const EventRequestTable = ({
 }: EventRequestTableProps): JSX.Element => {
     const dispatch: AppDispatch = useDispatch();
     const [selectedRow, setSelectedRow] = useState<Event | null>(null);
-    const [reviewComment, setReviewComment] = useState<string | null>(null);
+    const [reviewNote, setReviewNote] = useState<string | null>(null);
 
     const user: User | null = useSelector(
         (state: RootState) => state.user.userData,
@@ -63,12 +63,12 @@ export const EventRequestTable = ({
     const canAddComments: boolean =
         user !== null && canAddReviewComments(user.role);
 
-    const handleUpdateEvent = (id: string, status: EventStatus): void => {
+    const handleUpdateEvent = (id: string, approved: boolean): void => {
         dispatch(
             updateEventStatus({
                 id,
-                status,
-                comment: reviewComment,
+                approved,
+                reviewNotes: reviewNote,
             }),
         )
             .then(unwrapResult)
@@ -84,6 +84,7 @@ export const EventRequestTable = ({
                     .then(console.log.bind(this))
                     .catch(console.log.bind(this));
                 setSelectedRow(null);
+                setReviewNote(null);
             })
             .catch((e) => {
                 console.warn("Updating event status failed unexpectedly", e);
@@ -98,12 +99,12 @@ export const EventRequestTable = ({
 
     const handleApproveRequest = (): void => {
         if (selectedRow === null) return;
-        handleUpdateEvent(selectedRow.id, EventStatus.APPROVED_BY_SCSO);
+        handleUpdateEvent(selectedRow.id, true);
     };
 
     const handleRejectRequest = (): void => {
         if (selectedRow === null) return;
-        handleUpdateEvent(selectedRow.id, EventStatus.REJECTED_BY_SCSO);
+        handleUpdateEvent(selectedRow.id, false);
     };
 
     if (user === null) {
@@ -140,17 +141,27 @@ export const EventRequestTable = ({
                             {canAddComments && (
                                 <FormControl style={{ width: "30ch" }}>
                                     <InputLabel htmlFor={"review-input"}>
-                                        Review comment
+                                        Review note
                                     </InputLabel>
                                     <OutlinedInput
                                         id="review-input"
-                                        value={reviewComment ?? ""}
-                                        label="Review comment"
+                                        value={reviewNote ?? ""}
+                                        label="Review note"
                                         onChange={(e) =>
-                                            setReviewComment(e.target.value)
+                                            setReviewNote(e.target.value)
                                         }
                                     />
                                 </FormControl>
+                            )}
+                            {selectedRow.reviewNotes !== null && (
+                                <div>
+                                    <Typography variant="subtitle2">
+                                        Existing review note(s):{" "}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        {selectedRow.reviewNotes}
+                                    </Typography>
+                                </div>
                             )}
                             <div>
                                 <Button

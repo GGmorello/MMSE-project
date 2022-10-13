@@ -8,7 +8,6 @@ import {
     User,
     Event,
     EventBase,
-    EventStatus,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -75,11 +74,11 @@ class WebService {
 
     async updateEventStatus(
         id: string,
-        status: EventStatus,
-        comment: string | null,
+        approved: boolean,
+        reviewNotes: string | null,
     ): Promise<Response<Event>> {
         return await this.instance
-            .put<Event>("event/approve", { id, status, comment })
+            .put<Event>("event/approve", { id, approved, reviewNotes })
             .then((res: AxiosResponse<Event>) => {
                 const resp: SuccessResponse<Event> = {
                     type: ResponseType.SUCCESSFUL,
