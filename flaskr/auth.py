@@ -53,7 +53,7 @@ def login():
         password = request.json['password']
         db = create_connection()
         error = None
-        user = db.execute(
+        user = db.cursor().execute(
             'SELECT * FROM user WHERE username = ?', (username,)
         ).fetchone()
 

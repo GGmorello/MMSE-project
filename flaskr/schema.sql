@@ -1,7 +1,6 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS event;
 
-
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
@@ -10,17 +9,19 @@ CREATE TABLE user (
   access_token TEXT DEFAULT (RANDOM())
 );
 
-INSERT INTO user (username, password, role) VALUES ('FINANCIAL_MANAGER', 'FINANCIAL_MANAGER', 'FINANCIAL_MANAGER');
-INSERT INTO user (username, password, role) VALUES ('CUSTOMER_SERVICE', 'CUSTOMER_SERVICE', 'CUSTOMER_SERVICE');
+INSERT INTO user (username, password, role) VALUES ('ADM', 'ADM', 'ADMINISTRATION_MANAGER');
+INSERT INTO user (username, password, role) VALUES ('FMM', 'FMM', 'FINANCIAL_MANAGER');
+INSERT INTO user (username, password, role) VALUES ('CSS', 'CSS', 'CUSTOMER_SERVICE');
 INSERT INTO user (username, password, role) VALUES ('CLIENT', 'CLIENT', 'CLIENT');
-INSERT INTO user (username, password, role) VALUES ('SENIOR_CUSTOMER_SERVICE_OFFICER', 'SENIOR_CUSTOMER_SERVICE_OFFICER', 'SENIOR_CUSTOMER_SERVICE_OFFICER');
+INSERT INTO user (username, password, role) VALUES ('SCSO', 'SCSO', 'SENIOR_CUSTOMER_SERVICE_OFFICER');
 
 CREATE TABLE event (
-  id INTEGER PRIMARY KEY UNIQUE,
+  id TEXT PRIMARY KEY UNIQUE,
   clientId TEXT NOT NULL,
   startDate DATE NOT NULL,
   endDate DATE NOT NULL,
-  eventRequestItem TEXT,
+  reviewNotes TEXT,
+  eventRequestItems TEXT,
   status TEXT NOT NULL DEFAULT "NEW"
 );
 

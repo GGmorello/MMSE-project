@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { loginUser } from "store/user/userSlice";
 import { AppDispatch, RootState } from "store/store";
-import { MessageType, User } from "model";
+import { LoadingState, MessageType, User } from "model";
 import { addMessage } from "store/message/messageSlice";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -26,7 +26,7 @@ const LoginPage = (): JSX.Element => {
     const [password, setPassword] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    const isLoading = loading === "pending";
+    const isLoading = loading === LoadingState.PENDING;
 
     const canLogin = username.length >= 3 && password.length >= 3;
 

@@ -41,7 +41,7 @@ def init_app(app):
 
 def main():
     conn = create_connection()
-    with open('flaskr/schema.sql') as f:
+    with open('schema.sql') as f:
         conn.executescript(f.read())
 
 def create_connection():
@@ -53,7 +53,7 @@ def create_connection():
 
     except Error as e:
         print(e)
-    return conn.cursor()
+    return conn
 
 def dict_factory(cursor, row):
     d = {}

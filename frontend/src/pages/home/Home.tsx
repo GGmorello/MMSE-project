@@ -1,14 +1,15 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Button, Tab, Typography } from "@mui/material";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { getRoleRoutes, getRouteLabel } from "logic/routes";
+import { getRolePages, getPageLabel } from "logic/pages";
 import { MessageType, Page, User } from "model";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addMessage } from "store/message/messageSlice";
 import { AppDispatch, RootState } from "store/store";
 import { logoutUser } from "store/user/userSlice";
-import { SubmitClientDetails } from "./submitClientDetails/SubmitClientDetails";
+import { BrowseEventRequests } from "./browseEventRequests/BrowseEventRequests";
+import { SubmitEventRequest } from "./submitEventRequest/SubmitEventRequest";
 
 export const Home = (): JSX.Element => {
     const dispatch: AppDispatch = useDispatch();
@@ -29,7 +30,7 @@ export const Home = (): JSX.Element => {
             setUserRoutes([]);
             return;
         }
-        const userRoutes: Page[] = getRoleRoutes(user.role);
+        const userRoutes: Page[] = getRolePages(user.role);
         setUserRoutes(userRoutes);
     }, [user]);
 
@@ -57,8 +58,10 @@ export const Home = (): JSX.Element => {
 
     const getRouteComponent = (page: Page): JSX.Element => {
         switch (page) {
-            case Page.SUBMIT_CLIENT_DETAILS:
-                return <SubmitClientDetails />;
+            case Page.SUBMIT_EVENT_REQUEST:
+                return <SubmitEventRequest />;
+            case Page.BROWSE_EVENT_REQUEST:
+                return <BrowseEventRequests />;
             default:
                 console.warn(
                     "Unexpected page received, cannot calculate correct page component",
@@ -88,6 +91,7 @@ export const Home = (): JSX.Element => {
                         flex: 1,
                         display: "flex",
                         flexDirection: "row",
+                        backgroundColor: "#282c34",
                     }}
                 >
                     <Box
@@ -99,6 +103,8 @@ export const Home = (): JSX.Element => {
                     >
                         <TabList
                             onChange={handleChange}
+                            variant="scrollable"
+                            scrollButtons="auto"
                             textColor="primary"
                             indicatorColor="primary"
                         >
@@ -119,7 +125,7 @@ export const Home = (): JSX.Element => {
                                                 variant="body2"
                                                 color={"white"}
                                             >
-                                                {getRouteLabel(route)}
+                                                {getPageLabel(route)}
                                             </Typography>
                                         }
                                         value={route}
@@ -163,7 +169,7 @@ export const Home = (): JSX.Element => {
                     {userRoutes.map((route: Page) => {
                         return (
                             <TabPanel key={route} value={route}>
-                                {getRouteComponent(route)}
+                                {route === value && getRouteComponent(route)}
                             </TabPanel>
                         );
                     })}
