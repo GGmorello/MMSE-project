@@ -127,6 +127,44 @@ def approve():
     event['eventRequestItems'] = eval(event['eventRequestItems'])
     return event
 
+
+@bp.route("/application", methods=['POST'])
+@cross_origin()
+def application():
+    user, db = init(request)
+    if user is None:
+        return Response("Invalid user", status=400)
+
+    role = user['role']
+
+    if role == 'PRODUCTION_DEPARTMENT_MANAGER' or role == 'SERVICE_DEPARTMENT_MANAGER':
+        identifier = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24))
+
+        db.cursor().execute(
+            'INSERT INTO tasks (subteamId, description, eventId) VALUES (?,?,?)', (
+                request.json['subteamId'], request.json['description'], request.args['eventId'])
+        )
+        db.commit()
+
+        task = db.execute('SELECT * FROM tasks WHERE id = ?', (identifier,)).fetchone()
+
+        return task
+
+
+@bp.route("/tasks", methods=['GET'])
+@cross_origin()
+def get_tasks():
+    user, db = init(request)
+    if user is None:
+        return Response("Invalid user", status=400)
+
+    tasks = db.cursor().execute(
+        'SELECT * FROM tasks WHERE subteamId = ? AND eventId = ?', (request.args['subteamId'], request.args['eventId'])
+    )
+
+    return {'tasks': tasks}
+
+
 def init(req):
     token = req.headers['Authorization']
 
@@ -137,3 +175,4 @@ def init(req):
     ).fetchone()
 
     return user, db
+
