@@ -1,5 +1,5 @@
 import { formatISO } from "date-fns";
-import { EventBase, EventStatus } from "model";
+import { EventBase, EventStatus, TaskApplicationBase, TaskBase } from "model";
 
 /**
  * Creates a default event for the provided user
@@ -16,6 +16,23 @@ export function createDefaultEvent(): EventBase {
         endDate,
         eventRequestItems: [],
     };
+}
+
+export function createDefaultTaskApplication(): TaskApplicationBase {
+    const application: TaskApplicationBase = {
+        eventId: "",
+        tasks: [],
+    };
+    return application;
+}
+
+export function createDefaultTask(): TaskBase {
+    const task: TaskBase = {
+        taskId: 0,
+        subteamId: "",
+        description: "",
+    };
+    return task;
 }
 
 export function getEventStatusLabel(status: EventStatus): string {

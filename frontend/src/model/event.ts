@@ -25,3 +25,23 @@ export interface Event extends EventBase {
     status: EventStatus;
     reviewNotes: string | null;
 }
+
+export interface TaskApplicationBase {
+    eventId: string;
+    tasks: TaskBase[];
+}
+
+export interface TaskApplication extends TaskApplicationBase {
+    id: string;
+    tasks: Task[];
+}
+
+export interface TaskBase {
+    taskId: number;
+    subteamId: string;
+    description: string;
+}
+
+export interface Task extends TaskBase {
+    id: string;
+}

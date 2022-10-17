@@ -8,6 +8,9 @@ import {
     User,
     Event,
     EventBase,
+    TaskApplicationBase,
+    TaskApplication,
+    TaskBase,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -87,6 +90,40 @@ class WebService {
                 return resp;
             })
             .catch(this.createDefaultErrorResponse);
+    }
+
+    async createTaskApplication(
+        application: TaskApplicationBase,
+    ): Promise<Response<TaskApplication>> {
+        // TODO: Integrate with backend
+        return await new Promise((resolve, reject) => {
+            setTimeout(() => {
+                const res: SuccessResponse<TaskApplication> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: {
+                        ...application,
+                        id: "temp-id",
+                        tasks: application.tasks.map(
+                            (t: TaskBase, i: number) => ({
+                                ...t,
+                                id: `task-${i}`,
+                            }),
+                        ),
+                    },
+                };
+                resolve(res);
+            }, 3000);
+        });
+        // return await this.instance
+        //     .post<TaskApplication>("event/application", application)
+        //     .then((res: AxiosResponse<TaskApplication>) => {
+        //         const resp: SuccessResponse<TaskApplication> = {
+        //             type: ResponseType.SUCCESSFUL,
+        //             data: res.data,
+        //         };
+        //         return resp;
+        //     })
+        //     .catch(this.createDefaultErrorResponse);
     }
 
     private createDefaultErrorResponse(
