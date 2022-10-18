@@ -127,6 +127,26 @@ def approve():
     event['eventRequestItems'] = eval(event['eventRequestItems'])
     return event
 
+@bp.route("/request", methods=['PUT'])
+@cross_origin()
+def financialRequest():
+    user, db = init(request)
+
+    if user is None:
+        return Response("Invalid user", status=400)
+    
+    role = user['role']
+
+    if (role != "SERVICE_MANAGER" and role != "PRODUCTION_MANAGER"):
+        return Response("Unauthorized", 403)
+    cur = db.cursor()
+    cur.execute('INSERT INTO financial_request (requestor, request, taskId) VALUES (?,?,?)',
+                (request.json['requestor'], request.json['taskId'], request.json['taskId']))
+    db.commit()
+    id = cur.lastrowid
+    financial_request = cur.execute('SELECT * FROM financial_request WHERE id = ?', (id,)).fetchone()
+    return financial_request
+
 def init(req):
     token = req.headers['Authorization']
 
