@@ -8,6 +8,8 @@ import {
     User,
     Event,
     EventBase,
+    HiringRequest,
+    Role,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -51,6 +53,31 @@ class WebService {
                 return resp;
             })
             .catch(this.createDefaultErrorResponse);
+    }
+
+    async fetchHiringRequests(): Promise<Response<HiringRequest[]>> {
+        return await new Promise((resolve) => {
+            setTimeout(() => {
+                const mockResponse: Response<HiringRequest[]> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: [
+                        {
+                            id: "1",
+                            requestedRole: Role.TOP_CHEF,
+                            submittor: Role.SERVICE_MANAGER,
+                            comment: "please hire asap",
+                        },
+                        {
+                            id: "2",
+                            requestedRole: Role.AUDIO_SPECIALIST,
+                            submittor: Role.PRODUCTION_MANAGER,
+                            comment: "you can outsource this one if required",
+                        },
+                    ],
+                };
+                resolve(mockResponse);
+            }, 3000);
+        });
     }
 
     async createEvent(event: EventBase): Promise<Response<Event>> {

@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Message } from "model";
+import { logoutUser } from "store/user/userSlice";
 
 export interface MessageState {
     messages: Message[];
@@ -19,6 +20,11 @@ export const messageSlice = createSlice({
         setMessages: (state, action: PayloadAction<Message[]>) => {
             state.messages = action.payload;
         },
+    },
+    extraReducers: (builder) => {
+        builder.addCase(logoutUser.fulfilled, (state: MessageState) => {
+            state.messages = [];
+        });
     },
 });
 
