@@ -34,5 +34,6 @@ CREATE TABLE financial_request (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   requestor TEXT NOT NULL,
   request TEXT NOT NULL,
-  taskId TEXT NOT NULL UNIQUE
+  taskId TEXT NOT NULL UNIQUE,
+  status TEXT NOT NULL
 );
