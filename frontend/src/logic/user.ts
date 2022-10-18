@@ -1,4 +1,4 @@
-import { Role } from "model";
+import { AUDIO_SUBTEAM, CHEF_SUBTEAM, Role, Subteam } from "model";
 
 export function canEditEvents(role: Role): boolean {
     switch (role) {
@@ -18,5 +18,16 @@ export function canAddReviewComments(role: Role): boolean {
             return true;
         default:
             return false;
+    }
+}
+
+export function getSubteamRoles(subteam: Subteam): Role[] {
+    switch (subteam) {
+        case Subteam.CHEFS:
+            return CHEF_SUBTEAM;
+        case Subteam.AUDIO_SPECIALIST:
+            return AUDIO_SUBTEAM;
+        default:
+            return [];
     }
 }

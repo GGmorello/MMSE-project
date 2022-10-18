@@ -9,6 +9,8 @@ CREATE TABLE user (
   access_token TEXT DEFAULT (RANDOM())
 );
 
+INSERT INTO user (username, password, role) VALUES ('AUS', 'AUS', 'AUDIO_SPECIALIST');
+INSERT INTO user (username, password, role) VALUES ('TOPC', 'TOPC', 'TOP_CHEF');
 INSERT INTO user (username, password, role) VALUES ('ADM', 'ADM', 'ADMINISTRATION_MANAGER');
 INSERT INTO user (username, password, role) VALUES ('FMM', 'FMM', 'FINANCIAL_MANAGER');
 INSERT INTO user (username, password, role) VALUES ('CSS', 'CSS', 'CUSTOMER_SERVICE');

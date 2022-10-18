@@ -9,6 +9,7 @@ import { addMessage } from "store/message/messageSlice";
 import { AppDispatch, RootState } from "store/store";
 import { logoutUser } from "store/user/userSlice";
 import { BrowseEventRequests } from "./browseEventRequests/BrowseEventRequests";
+import { BrowseTeamTasks } from "./browseTeamTasks/BrowseTeamTasks";
 import { SubmitEventRequest } from "./submitEventRequest/SubmitEventRequest";
 
 export const Home = (): JSX.Element => {
@@ -58,10 +59,12 @@ export const Home = (): JSX.Element => {
 
     const getRouteComponent = (page: Page): JSX.Element => {
         switch (page) {
-            case Page.SUBMIT_EVENT_REQUEST:
-                return <SubmitEventRequest />;
             case Page.BROWSE_EVENT_REQUEST:
                 return <BrowseEventRequests />;
+            case Page.BROWSE_TEAM_TASKS:
+                return <BrowseTeamTasks />;
+            case Page.SUBMIT_EVENT_REQUEST:
+                return <SubmitEventRequest />;
             default:
                 console.warn(
                     "Unexpected page received, cannot calculate correct page component",

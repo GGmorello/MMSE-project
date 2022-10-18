@@ -8,6 +8,8 @@ import {
     User,
     Event,
     EventBase,
+    Task,
+    Subteam,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -87,6 +89,43 @@ class WebService {
                 return resp;
             })
             .catch(this.createDefaultErrorResponse);
+    }
+
+    async fetchTasks(): Promise<Response<Task[]>> {
+        return await new Promise((resolve) => {
+            setTimeout(() => {
+                const mockResponse: Response<Task[]> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: [
+                        {
+                            id: "123",
+                            eventId: "mock event",
+                            subteamId: Subteam.CHEFS,
+                            taskId: 1,
+                            description: "chef task",
+                        },
+                        {
+                            id: "456",
+                            eventId: "mock event",
+                            subteamId: Subteam.AUDIO_SPECIALIST,
+                            taskId: 2,
+                            description: "audio specialist task",
+                        },
+                    ],
+                };
+                resolve(mockResponse);
+            }, 3000);
+        });
+        // return await this.instance
+        //     .get<Task[]>("event/tasks")
+        //     .then((res: AxiosResponse<Task[]>) => {
+        //         const resp: SuccessResponse<Task[]> = {
+        //             type: ResponseType.SUCCESSFUL,
+        //             data: res.data,
+        //         };
+        //         return resp;
+        //     })
+        //     .catch(this.createDefaultErrorResponse);
     }
 
     private createDefaultErrorResponse(

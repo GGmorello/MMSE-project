@@ -1,3 +1,5 @@
+import { Subteam } from "model";
+
 export interface EventRequestItem {
     requestId: number;
     description: string;
@@ -24,4 +26,25 @@ export interface Event extends EventBase {
     id: string;
     status: EventStatus;
     reviewNotes: string | null;
+}
+
+export interface TaskApplicationBase {
+    eventId: string;
+    tasks: TaskBase[];
+}
+
+export interface TaskApplication extends TaskApplicationBase {
+    id: string;
+    tasks: Task[];
+}
+
+export interface TaskBase {
+    taskId: number;
+    eventId: string;
+    subteamId: Subteam;
+    description: string;
+}
+
+export interface Task extends TaskBase {
+    id: string;
 }
