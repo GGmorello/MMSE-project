@@ -1,4 +1,4 @@
-import { Subteam } from "model";
+import { Role, Subteam } from "model";
 
 export interface EventRequestItem {
     requestId: number;
@@ -43,8 +43,26 @@ export interface TaskBase {
     eventId: string;
     subteamId: Subteam;
     description: string;
+    taskRequest: TaskRequest | null;
+}
+
+export interface TaskRequest {
+    taskId: string;
+    subteam: Subteam | null;
+    role: Role;
+    request: string;
 }
 
 export interface Task extends TaskBase {
     id: string;
+}
+
+export interface FinancialRequestBase {
+    taskId: string;
+    request: string;
+}
+
+export interface FinancialRequest extends FinancialRequestBase {
+    id: string;
+    submittor: Role;
 }

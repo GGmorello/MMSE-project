@@ -1,7 +1,8 @@
 import { Typography } from "@mui/material";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { TaskItemTable } from "components/events/TaskItemTable";
-import { LoadingState } from "model";
+import { canSubmitFinancialRequests } from "logic/user";
+import { LoadingState, User } from "model";
 import { MessageType } from "model/message";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,10 +12,14 @@ import { AppDispatch, RootState } from "store/store";
 
 export const BrowseTeamTasks = (): JSX.Element => {
     const dispatch: AppDispatch = useDispatch();
+    const user: User | null = useSelector((state: RootState) => state.user.userData);
     const tasks = useSelector((state: RootState) => state.event.tasks);
 
     const loadingState: LoadingState = useSelector((state: RootState) => state.event.loading);
-    const loading = loadingState === LoadingState.PENDING;
+    const creatingState: LoadingState = useSelector((state: RootState) => state.event.creating);
+    const loading = loadingState === LoadingState.PENDING || creatingState === LoadingState.PENDING;
+
+    const submitFinancialRequestsEnabled: boolean = user !== null && canSubmitFinancialRequests(user.role);
 
     useEffect(() => {
         dispatch(fetchTasks(""))
@@ -30,8 +35,6 @@ export const BrowseTeamTasks = (): JSX.Element => {
                 );
             });
     }, []);
-
-    console.log("tasks received", tasks);
 
     return (
         <div
@@ -54,7 +57,7 @@ export const BrowseTeamTasks = (): JSX.Element => {
                     }}
                 >
                     <Typography variant="h3">Browse Team Tasks</Typography>
-                    <TaskItemTable items={tasks} loading={loading} />
+                    <TaskItemTable canSubmitFinancialRequests={submitFinancialRequestsEnabled} items={tasks} loading={loading} />
                 </div>
             </div>
         </div>

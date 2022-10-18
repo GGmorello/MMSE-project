@@ -10,6 +10,8 @@ import {
     EventBase,
     Task,
     Subteam,
+    Role,
+    FinancialRequest,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -91,6 +93,23 @@ class WebService {
             .catch(this.createDefaultErrorResponse);
     }
 
+    async submitFinancialRequest(
+        taskId: string,
+        requestor: Role,
+        request: string,
+    ): Promise<Response<FinancialRequest>> {
+        return await this.instance
+            .put<FinancialRequest>("event/request", { taskId, requestor, request })
+            .then((res: AxiosResponse<FinancialRequest>) => {
+                const resp: SuccessResponse<FinancialRequest> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
     async fetchTasks(): Promise<Response<Task[]>> {
         return await new Promise((resolve) => {
             setTimeout(() => {
@@ -103,6 +122,12 @@ class WebService {
                             subteamId: Subteam.CHEFS,
                             taskId: 1,
                             description: "chef task",
+                            taskRequest: {
+                                taskId: "123",
+                                subteam: Subteam.CHEFS,
+                                role: Role.TOP_CHEF,
+                                request: "please give us more money",
+                            },
                         },
                         {
                             id: "456",
@@ -110,6 +135,12 @@ class WebService {
                             subteamId: Subteam.AUDIO_SPECIALIST,
                             taskId: 2,
                             description: "audio specialist task",
+                            taskRequest: {
+                                taskId: "456",
+                                subteam: Subteam.AUDIO_SPECIALIST,
+                                role: Role.AUDIO_SPECIALIST,
+                                request: "too many lights bro",
+                            },
                         },
                     ],
                 };

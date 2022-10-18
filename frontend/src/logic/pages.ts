@@ -1,4 +1,4 @@
-import { Role, Page, SERVICE_DEPARTMENT_SUBTEAMS, PRODUCTION_DEPARTMENT_SUBTEAMS } from "model";
+import { Role, Page, SERVICE_DEPARTMENT_ROLES, PRODUCTION_DEPARTMENT_ROLES } from "model";
 
 export function getRolePages(role: Role): Page[] {
     const departmentPages: Page[] = getSubteamPages(role);
@@ -9,12 +9,16 @@ export function getRolePages(role: Role): Page[] {
             return [Page.BROWSE_EVENT_REQUEST, ...departmentPages];
         case Role.CUSTOMER_SERVICE:
             return [Page.SUBMIT_EVENT_REQUEST, ...departmentPages];
-        case Role.TOP_CHEF:
-            return [...departmentPages];
         case Role.FINANCIAL_MANAGER:
             return [Page.BROWSE_EVENT_REQUEST, ...departmentPages];
+        case Role.PRODUCTION_MANAGER:
+            return [...departmentPages];
         case Role.SENIOR_CUSTOMER_SERVICE_OFFICER:
             return [Page.BROWSE_EVENT_REQUEST, ...departmentPages];
+        case Role.SERVICE_MANAGER:
+            return [...departmentPages];
+        case Role.TOP_CHEF:
+            return [...departmentPages];
         default:
             console.warn(
                 "Unexpected role received, cannot calculate routes.",
@@ -25,8 +29,8 @@ export function getRolePages(role: Role): Page[] {
 }
 
 export function getSubteamPages(role: Role): Page[] {
-    const isServiceSubteam: boolean = SERVICE_DEPARTMENT_SUBTEAMS.some((subTeam: Role[]) => subTeam.includes(role));
-    const isProductionSubteam: boolean = PRODUCTION_DEPARTMENT_SUBTEAMS.some((subTeam: Role[]) => subTeam.includes(role));
+    const isServiceSubteam: boolean = SERVICE_DEPARTMENT_ROLES.includes(role);
+    const isProductionSubteam: boolean = PRODUCTION_DEPARTMENT_ROLES.includes(role);
     switch (true) {
         case isProductionSubteam:
         case isServiceSubteam:

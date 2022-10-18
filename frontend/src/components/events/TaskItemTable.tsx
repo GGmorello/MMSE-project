@@ -1,35 +1,64 @@
+/* eslint-disable multiline-ternary */
 import React, { useEffect, useState } from "react";
 
-import { TaskBase } from "model";
-import { DataGrid, GridSelectionModel } from "@mui/x-data-grid";
-import { Button } from "@mui/material";
+import { MessageType, TaskBase } from "model";
+import { DataGrid, GridColumns, GridSelectionModel } from "@mui/x-data-grid";
+import {
+    Button,
+    FormControl,
+    InputLabel,
+    OutlinedInput,
+    Typography,
+} from "@mui/material";
+import { AppDispatch } from "store/store";
+import { useDispatch } from "react-redux";
+import { submitFinancialRequest } from "store/event/eventSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { addMessage } from "store/message/messageSlice";
 
 interface TaskItemTableProps {
+    canSubmitFinancialRequests?: boolean;
     items: TaskBase[];
     loading?: boolean;
     onRowsUpdated?: (updatedRows: TaskBase[]) => void;
 }
 
-const columns: Array<{
-    field: keyof TaskBase;
-    headerName: string;
-    width: number;
-}> = [
+const columns: GridColumns<TaskBase> = [
     { field: "subteamId", headerName: "Subteam ID", width: 130 },
-    { field: "description", headerName: "Description", width: 230 },
+    { field: "description", headerName: "Description", width: 220 },
+    {
+        field: "taskRequest",
+        headerName: "Request",
+        renderCell: (params) => {
+            const request = params.row.taskRequest;
+            if (request !== null) {
+                return request.request;
+            }
+            return "-";
+        },
+        width: 250,
+    },
 ];
 
 export const TaskItemTable = ({
+    canSubmitFinancialRequests,
     items,
     loading,
     onRowsUpdated,
 }: TaskItemTableProps): JSX.Element => {
+    const dispatch: AppDispatch = useDispatch();
+
     const [rows, setRows] = useState<TaskBase[]>(items);
     const [selectedRows, setSelectedRows] = useState<Array<string | number>>(
         [],
     );
+    const [reviewNote, setReviewNote] = useState<string>("");
 
     const editRowsEnabled: boolean = onRowsUpdated !== undefined;
+    const submitFinancialRequestEnabled: boolean =
+        canSubmitFinancialRequests !== undefined &&
+        canSubmitFinancialRequests &&
+        selectedRows.length > 0;
 
     useEffect(() => {
         setRows(items);
@@ -39,6 +68,32 @@ export const TaskItemTable = ({
         selectionModel: GridSelectionModel,
     ): void => {
         setSelectedRows(selectionModel);
+    };
+
+    const handleSubmitFinancialRequest = (): void => {
+        dispatch(
+            submitFinancialRequest({
+                taskId: `${selectedRows[0]}`,
+                request: reviewNote,
+            }),
+        )
+            .then(unwrapResult)
+            .then((res: any) => {
+                console.log("financial request submitted", res);
+                dispatch(addMessage({
+                    type: MessageType.SUCCESS,
+                    message: "Financial request submitted",
+                }));
+                setSelectedRows([]);
+                setReviewNote("");
+            })
+            .catch((e) => {
+                console.warn("submitting financial request failed unexpectedly", e);
+                dispatch(addMessage({
+                    type: MessageType.ERROR,
+                    message: "Financial request submission failed - please try again",
+                }));
+            });
     };
 
     const handleRemoveRows = (): void => {
@@ -66,6 +121,32 @@ export const TaskItemTable = ({
                     onSelectionModelChange={handleSelectionChanged}
                 />
             </div>
+            {submitFinancialRequestEnabled && (
+                <div>
+                    <Typography variant="h4">
+                        Submit a financial request
+                    </Typography>
+                    <FormControl style={{ width: "30ch", marginRight: 10 }}>
+                        <InputLabel htmlFor={"request-note-input"}>
+                            Request note
+                        </InputLabel>
+                        <OutlinedInput
+                            id="request-note-input"
+                            value={reviewNote ?? ""}
+                            label="Request note"
+                            onChange={(e) => setReviewNote(e.target.value)}
+                        />
+                    </FormControl>
+                    <Button
+                        color="warning"
+                        variant="contained"
+                        disabled={loading}
+                        onClick={handleSubmitFinancialRequest}
+                    >
+                        Submit
+                    </Button>
+                </div>
+            )}
             {onRowsUpdated !== undefined && selectedRows.length > 0 && (
                 <Button
                     color="warning"
