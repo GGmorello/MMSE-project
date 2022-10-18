@@ -10,6 +10,7 @@ import { AppDispatch, RootState } from "store/store";
 import { logoutUser } from "store/user/userSlice";
 import { BrowseEventRequests } from "./browseEventRequests/BrowseEventRequests";
 import { SubmitEventRequest } from "./submitEventRequest/SubmitEventRequest";
+import { SubmitHiringRequest } from "./submitHiringRequest/SubmitHiringRequest";
 
 export const Home = (): JSX.Element => {
     const dispatch: AppDispatch = useDispatch();
@@ -58,10 +59,12 @@ export const Home = (): JSX.Element => {
 
     const getRouteComponent = (page: Page): JSX.Element => {
         switch (page) {
-            case Page.SUBMIT_EVENT_REQUEST:
-                return <SubmitEventRequest />;
             case Page.BROWSE_EVENT_REQUEST:
                 return <BrowseEventRequests />;
+            case Page.SUBMIT_EVENT_REQUEST:
+                return <SubmitEventRequest />;
+            case Page.SUBMIT_HIRING_REQUEST:
+                return <SubmitHiringRequest />;
             default:
                 console.warn(
                     "Unexpected page received, cannot calculate correct page component",
