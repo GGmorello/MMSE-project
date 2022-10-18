@@ -164,11 +164,21 @@ def approveFinancialRequest():
 
     if event is None:
         return Response("Bad request - id invalid", status=400)
+
+    currentStatus = event["status"]
+
+    if currentStatus != "SUBMITTED":
+        return Response("Bad request - request is already reviewed", status=400)
     
+    newStatus = ""
+    if request.json["approved"]:
+        newStatus = "APPROVED"
+    else:
+        newStatus = "REJECTED"
 
     cur = db.cursor()
     cur.execute(
-        'UPDATE financial_request SET status = ? WHERE id = ?', ("APPROVED", id,)
+        'UPDATE financial_request SET status = ? WHERE id = ?', (newStatus, id,)
     )
     db.commit()
     req = cur.execute('SELECT * FROM financial_request WHERE id = ?', (id,)).fetchone()
