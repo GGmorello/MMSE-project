@@ -14,12 +14,13 @@ export const BrowseTeamTasks = (): JSX.Element => {
     const tasks = useSelector((state: RootState) => state.event.tasks);
 
     const loadingState: LoadingState = useSelector((state: RootState) => state.event.loading);
-    const loading = loadingState === LoadingState.PENDING;
+    const creatingState: LoadingState = useSelector((state: RootState) => state.event.creating);
+    const loading: boolean = loadingState === LoadingState.PENDING || creatingState === LoadingState.PENDING;
 
     useEffect(() => {
         dispatch(fetchTasks(""))
             .then(unwrapResult)
-            .then(() => {})
+            .then((res) => {})
             .catch((e) => {
                 console.warn("Task loading failed unexpectedly", e);
                 dispatch(
@@ -30,8 +31,6 @@ export const BrowseTeamTasks = (): JSX.Element => {
                 );
             });
     }, []);
-
-    console.log("tasks received", tasks);
 
     return (
         <div
@@ -54,7 +53,7 @@ export const BrowseTeamTasks = (): JSX.Element => {
                     }}
                 >
                     <Typography variant="h3">Browse Team Tasks</Typography>
-                    <TaskItemTable items={tasks} loading={loading} />
+                    <TaskItemTable canRaiseRequest items={tasks} loading={loading} />
                 </div>
             </div>
         </div>

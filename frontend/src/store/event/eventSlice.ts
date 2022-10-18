@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import WebService from "components/common/WebService";
-import { getSubteamRoles } from "logic/user";
+import { getRoleSubteam, getSubteamRoles } from "logic/user";
 import {
     Event,
     EventBase,
@@ -9,6 +9,7 @@ import {
     ResponseType,
     LoadingState,
     Task,
+    Subteam,
 } from "model";
 import { RootState } from "store/store";
 import { logoutUser } from "store/user/userSlice";
@@ -38,6 +39,38 @@ export const createEvent = createAsyncThunk(
         }
         const service: WebService = new WebService(user.access_token);
         const response: Response<Event> = await service.createEvent(newEvent);
+        switch (response.type) {
+            case ResponseType.SUCCESSFUL:
+                return response.data;
+            case ResponseType.ERROR:
+                return thunkAPI.rejectWithValue(undefined);
+            default:
+                console.log(
+                    "unexpected return type from login request: ",
+                    response,
+                );
+                return thunkAPI.rejectWithValue(undefined);
+        }
+    },
+);
+
+interface TaskRequest {
+    taskId: string;
+    request: string;
+}
+
+export const submitTaskRequest = createAsyncThunk(
+    "event/task/request",
+    async ({ taskId, request }: TaskRequest, thunkAPI) => {
+        const state: RootState = thunkAPI.getState() as RootState;
+        const user: User | null = state.user.userData;
+        if (user === null) {
+            console.warn("user data is null - cannot save event");
+            return thunkAPI.rejectWithValue("user is null");
+        }
+        const subteam: Subteam | null = getRoleSubteam(user.role);
+        const service: WebService = new WebService(user.access_token);
+        const response: Response<any> = await service.submitTaskRequest(taskId, subteam, user.role, request);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 return response.data;
@@ -175,6 +208,15 @@ export const eventSlice = createSlice({
                 state.creating = LoadingState.PENDING;
             })
             .addCase(createEvent.rejected, (state: EventState) => {
+                state.creating = LoadingState.FAILED;
+            })
+            .addCase(submitTaskRequest.fulfilled, (state: EventState) => {
+                state.creating = LoadingState.SUCCEEDED;
+            })
+            .addCase(submitTaskRequest.pending, (state: EventState) => {
+                state.creating = LoadingState.PENDING;
+            })
+            .addCase(submitTaskRequest.rejected, (state: EventState) => {
                 state.creating = LoadingState.FAILED;
             })
             .addCase(updateEventStatus.fulfilled, (state: EventState) => {

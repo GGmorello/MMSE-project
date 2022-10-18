@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
 
-import { TaskBase } from "model";
+import { MessageType, TaskBase } from "model";
 import { DataGrid, GridSelectionModel } from "@mui/x-data-grid";
-import { Button } from "@mui/material";
+import { Button, FormControl, InputLabel, OutlinedInput } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "store/store";
+import { submitTaskRequest } from "store/event/eventSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { addMessage } from "store/message/messageSlice";
 
 interface TaskItemTableProps {
+    canRaiseRequest?: boolean;
     items: TaskBase[];
     loading?: boolean;
     onRowsUpdated?: (updatedRows: TaskBase[]) => void;
@@ -20,20 +26,48 @@ const columns: Array<{
 ];
 
 export const TaskItemTable = ({
+    canRaiseRequest,
     items,
     loading,
     onRowsUpdated,
 }: TaskItemTableProps): JSX.Element => {
+    const dispatch: AppDispatch = useDispatch();
+
     const [rows, setRows] = useState<TaskBase[]>(items);
     const [selectedRows, setSelectedRows] = useState<Array<string | number>>(
         [],
     );
+    const [taskReviewNote, setTaskReviewNote] = useState<string>("");
 
     const editRowsEnabled: boolean = onRowsUpdated !== undefined;
+    const showRaiseRequest: boolean =
+        canRaiseRequest !== undefined &&
+        canRaiseRequest &&
+        selectedRows.length > 0;
 
     useEffect(() => {
         setRows(items);
     }, [items]);
+
+    const handleSubmitRequest = (): void => {
+        dispatch(submitTaskRequest({ taskId: `${selectedRows[0]}`, request: taskReviewNote }))
+            .then(unwrapResult)
+            .then((res: any) => {
+                console.log(res);
+                dispatch(addMessage({
+                    type: MessageType.SUCCESS,
+                    message: "Task request submitted successfully",
+                }));
+                setTaskReviewNote("");
+                setSelectedRows([]);
+            })
+            .catch(() => {
+                dispatch(addMessage({
+                    type: MessageType.ERROR,
+                    message: "Something went wrong when submitting task request - please try again",
+                }));
+            });
+    };
 
     const handleSelectionChanged = (
         selectionModel: GridSelectionModel,
@@ -66,6 +100,29 @@ export const TaskItemTable = ({
                     onSelectionModelChange={handleSelectionChanged}
                 />
             </div>
+            {showRaiseRequest && (
+                <div style={{ marginTop: 20 }}>
+                    <FormControl style={{ width: "30ch" }}>
+                        <InputLabel htmlFor={"raise-request-input"}>
+                            Raise request
+                        </InputLabel>
+                        <OutlinedInput
+                            id="raise-request-input"
+                            value={taskReviewNote ?? ""}
+                            label="Raise request"
+                            onChange={(e) => setTaskReviewNote(e.target.value)}
+                        />
+                    </FormControl>
+                    <Button
+                        disabled={loading}
+                        color="warning"
+                        variant="contained"
+                        onClick={handleSubmitRequest}
+                    >
+                        Submit request
+                    </Button>
+                </div>
+            )}
             {onRowsUpdated !== undefined && selectedRows.length > 0 && (
                 <Button
                     color="warning"

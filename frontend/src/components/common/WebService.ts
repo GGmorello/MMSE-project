@@ -10,6 +10,7 @@ import {
     EventBase,
     Task,
     Subteam,
+    Role,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -53,6 +54,24 @@ class WebService {
                 return resp;
             })
             .catch(this.createDefaultErrorResponse);
+    }
+
+    async submitTaskRequest(taskId: string, subteam: Subteam | null, role: Role, request: string): Promise<Response<any>> {
+        return await new Promise((resolve) => {
+            setTimeout(() => {
+                const data: { [key: string]: any } = {
+                    taskId,
+                    subteam,
+                    role,
+                    request,
+                };
+                const mockResponse: Response<any> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data,
+                };
+                resolve(mockResponse);
+            }, 3000);
+        });
     }
 
     async createEvent(event: EventBase): Promise<Response<Event>> {
