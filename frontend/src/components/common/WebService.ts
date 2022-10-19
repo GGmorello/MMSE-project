@@ -8,8 +8,9 @@ import {
     User,
     Event,
     EventBase,
-    HiringRequest,
     Role,
+    FinancialRequest,
+    HiringRequest,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -64,13 +65,13 @@ class WebService {
                         {
                             id: "1",
                             requestedRole: Role.TOP_CHEF,
-                            submittor: Role.SERVICE_MANAGER,
+                            requestor: Role.SERVICE_MANAGER,
                             comment: "please hire asap",
                         },
                         {
                             id: "2",
                             requestedRole: Role.AUDIO_SPECIALIST,
-                            submittor: Role.PRODUCTION_MANAGER,
+                            requestor: Role.PRODUCTION_MANAGER,
                             comment: "you can outsource this one if required",
                         },
                     ],
@@ -78,6 +79,32 @@ class WebService {
                 resolve(mockResponse);
             }, 3000);
         });
+    }
+
+    async fetchFinancialRequests(): Promise<Response<FinancialRequest[]>> {
+        return await this.instance
+            .get<FinancialRequest[]>("event/requests")
+            .then((res: AxiosResponse<FinancialRequest[]>) => {
+                const resp: SuccessResponse<FinancialRequest[]> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async updateFinancialRequestStatus(id: string, approved: boolean): Promise<Response<FinancialRequest>> {
+        return await this.instance
+            .put<FinancialRequest>("event/request/approve", { id, approved })
+            .then((res: AxiosResponse<FinancialRequest>) => {
+                const resp: SuccessResponse<FinancialRequest> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
     }
 
     async createEvent(event: EventBase): Promise<Response<Event>> {
@@ -108,6 +135,19 @@ class WebService {
             .put<Event>("event/approve", { id, approved, reviewNotes })
             .then((res: AxiosResponse<Event>) => {
                 const resp: SuccessResponse<Event> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async submitHiringRequest(requestor: Role, requestedRole: Role, comment: string): Promise<Response<HiringRequest>> {
+        return await this.instance
+            .post<HiringRequest>("user/hire", { requestor, requestedRole, comment })
+            .then((res: AxiosResponse<HiringRequest>) => {
+                const resp: SuccessResponse<HiringRequest> = {
                     type: ResponseType.SUCCESSFUL,
                     data: res.data,
                 };

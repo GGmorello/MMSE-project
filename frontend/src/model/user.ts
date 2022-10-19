@@ -5,6 +5,16 @@ export interface User {
     role: Role;
 }
 
+export interface HiringRequestBase {
+    requestedRole: Role;
+    comment: string;
+}
+
+export interface HiringRequest extends HiringRequestBase {
+    requestor: Role;
+    id: string;
+}
+
 export enum Role {
     ADMINISTRATION_MANAGER = "ADMINISTRATION_MANAGER",
     AUDIO_SPECIALIST = "AUDIO_SPECIALIST",
@@ -17,9 +27,17 @@ export enum Role {
     TOP_CHEF = "TOP_CHEF",
 }
 
-export interface HiringRequest {
-    id: string;
-    submittor: Role;
-    requestedRole: Role;
-    comment: string;
+export enum Subteam {
+    CHEFS = "CHEF_SUBTEAM",
+    AUDIO_SPECIALIST = "AUDIO_SPECIALISTS_SUBTEAM",
 }
+
+export const AUDIO_SUBTEAM: Role[] = [Role.AUDIO_SPECIALIST];
+export const CHEF_SUBTEAM: Role[] = [Role.TOP_CHEF];
+
+export const PRODUCTION_DEPARTMENT_SUBTEAMS: Role[][] = [AUDIO_SUBTEAM];
+export const SERVICE_DEPARTMENT_SUBTEAMS: Role[][] = [CHEF_SUBTEAM];
+
+export const ADMINISTARTION_DEPARTMENT_ROLES: Role[] = [Role.ADMINISTRATION_MANAGER, Role.SENIOR_CUSTOMER_SERVICE_OFFICER];
+export const SERVICE_DEPARTMENT_ROLES: Role[] = [Role.SERVICE_MANAGER, Role.TOP_CHEF];
+export const PRODUCTION_DEPARTMENT_ROLES: Role[] = [Role.PRODUCTION_MANAGER, Role.AUDIO_SPECIALIST];
