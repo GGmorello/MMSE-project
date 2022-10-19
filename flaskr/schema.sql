@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS financial_request;
+DROP TABLE IF EXISTS hiring_request;
 DROP TABLE IF EXISTS event;
 
 CREATE TABLE user (
@@ -36,4 +37,11 @@ CREATE TABLE financial_request (
   request TEXT NOT NULL,
   taskId TEXT NOT NULL UNIQUE,
   status TEXT NOT NULL
+);
+
+create table hiring_request (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  requestor TEXT NOT NULL,
+  requestedRole TEXT NOT NULL,
+  comment TEXT NOT NULL
 );

@@ -1,4 +1,9 @@
-import { FinancialRequestStatus, Role } from "model";
+import {
+    FinancialRequestStatus,
+    Role,
+    PRODUCTION_DEPARTMENT_SUBTEAMS,
+    SERVICE_DEPARTMENT_SUBTEAMS,
+} from "model";
 
 export function canEditEvents(role: Role): boolean {
     switch (role) {
@@ -21,6 +26,32 @@ export function canAddReviewComments(role: Role): boolean {
     }
 }
 
+export function getDepartmentRoles(managerRole: Role): Role[] {
+    switch (managerRole) {
+        case Role.SERVICE_MANAGER:
+            return SERVICE_DEPARTMENT_SUBTEAMS.flat();
+        case Role.PRODUCTION_MANAGER:
+            return PRODUCTION_DEPARTMENT_SUBTEAMS.flat();
+        default:
+            return [];
+    }
+}
+
+export function getRoleLabel(role: Role): string {
+    switch (role) {
+        case Role.AUDIO_SPECIALIST:
+            return "Audio specialist";
+        case Role.TOP_CHEF:
+            return "Top chef";
+        default:
+            console.warn(
+                "Unexpected role received - translation not defined",
+                role,
+            );
+            return "NOT_IMPLEMENTED";
+    }
+}
+
 export function canReviewFinancialRequests(role: Role): boolean {
     switch (role) {
         case Role.FINANCIAL_MANAGER:
@@ -30,7 +61,9 @@ export function canReviewFinancialRequests(role: Role): boolean {
     }
 }
 
-export function getFinancialStatusLabel(status: FinancialRequestStatus): string {
+export function getFinancialStatusLabel(
+    status: FinancialRequestStatus,
+): string {
     switch (status) {
         case FinancialRequestStatus.APPROVED:
             return "Approved";
@@ -39,7 +72,10 @@ export function getFinancialStatusLabel(status: FinancialRequestStatus): string 
         case FinancialRequestStatus.SUBMITTED:
             return "Submitted";
         default:
-            console.warn("Unknown financial status label encountered - cannot determine label", status);
+            console.warn(
+                "Unknown financial status label encountered - cannot determine label",
+                status,
+            );
             return "Unknown";
     }
 }

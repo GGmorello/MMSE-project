@@ -8,7 +8,9 @@ import {
     User,
     Event,
     EventBase,
+    Role,
     FinancialRequest,
+    HiringRequest,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -108,6 +110,19 @@ class WebService {
             .put<Event>("event/approve", { id, approved, reviewNotes })
             .then((res: AxiosResponse<Event>) => {
                 const resp: SuccessResponse<Event> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async submitHiringRequest(requestor: Role, requestedRole: Role, comment: string): Promise<Response<HiringRequest>> {
+        return await this.instance
+            .post<HiringRequest>("user/hire", { requestor, requestedRole, comment })
+            .then((res: AxiosResponse<HiringRequest>) => {
+                const resp: SuccessResponse<HiringRequest> = {
                     type: ResponseType.SUCCESSFUL,
                     data: res.data,
                 };
