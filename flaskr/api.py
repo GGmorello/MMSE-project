@@ -164,11 +164,6 @@ def approveFinancialRequest():
 
     if event is None:
         return Response("Bad request - id invalid", status=400)
-
-    currentStatus = event["status"]
-
-    if currentStatus != "SUBMITTED":
-        return Response("Bad request - request is already reviewed", status=400)
     
     newStatus = ""
     if request.json["approved"]:
