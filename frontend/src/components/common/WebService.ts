@@ -10,6 +10,7 @@ import {
     EventBase,
     Role,
     FinancialRequest,
+    HiringRequest,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -117,17 +118,17 @@ class WebService {
             .catch(this.createDefaultErrorResponse);
     }
 
-    async submitHiringRequest(submitter: Role, requestedRole: Role, comment: string): Promise<Response<any>> {
-        return await new Promise((resolve) => {
-            setTimeout(() => {
-                const req: { [key: string]: any } = { submitter, requestedRole, comment };
-                const mockResponse: Response<any> = {
+    async submitHiringRequest(requestor: Role, requestedRole: Role, comment: string): Promise<Response<HiringRequest>> {
+        return await this.instance
+            .post<HiringRequest>("user/hire", { requestor, requestedRole, comment })
+            .then((res: AxiosResponse<HiringRequest>) => {
+                const resp: SuccessResponse<HiringRequest> = {
                     type: ResponseType.SUCCESSFUL,
-                    data: req,
+                    data: res.data,
                 };
-                resolve(mockResponse);
-            }, 3000);
-        });
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
     }
 
     private createDefaultErrorResponse(

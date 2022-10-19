@@ -13,7 +13,7 @@ export function getRolePages(role: Role): Page[] {
         case Role.SENIOR_CUSTOMER_SERVICE_OFFICER:
             return [Page.BROWSE_EVENT_REQUEST];
         case Role.SERVICE_MANAGER:
-            return [Page.SUBMIT_HIRING_REQUEST, Page.BROWSE_FINANCIAL_REQUEST];
+            return [Page.BROWSE_FINANCIAL_REQUEST, Page.SUBMIT_HIRING_REQUEST];
         default:
             console.warn(
                 "Unexpected role received, cannot calculate routes.",

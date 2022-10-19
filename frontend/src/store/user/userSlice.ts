@@ -110,7 +110,7 @@ export const submitHiringRequest = createAsyncThunk(
             return thunkAPI.rejectWithValue("user is null");
         }
         const service: WebService = new WebService(user.access_token);
-        const response: Response<Event> = await service.submitHiringRequest(user.role, requestedRole, comment);
+        const response: Response<HiringRequest> = await service.submitHiringRequest(user.role, requestedRole, comment);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 return response.data;

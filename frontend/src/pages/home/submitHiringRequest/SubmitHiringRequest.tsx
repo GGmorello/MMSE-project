@@ -65,6 +65,10 @@ export const SubmitHiringRequest = (): JSX.Element => {
             })
             .catch((e: any) => {
                 console.warn("Hiring request failed unexpectedly", e);
+                dispatch(addMessage({
+                    type: MessageType.ERROR,
+                    message: "Submitting Hiring request failed unexpectedly",
+                }));
             });
     };
 
