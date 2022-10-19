@@ -44,5 +44,6 @@ create table hiring_request (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   requestor TEXT NOT NULL,
   requestedRole TEXT NOT NULL,
-  comment TEXT NOT NULL
+  comment TEXT NOT NULL,
+  status TEXT NOT NULL
 );
