@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS financial_request;
 DROP TABLE IF EXISTS event;
 
 CREATE TABLE user (
@@ -9,6 +10,10 @@ CREATE TABLE user (
   access_token TEXT DEFAULT (RANDOM())
 );
 
+INSERT INTO user (username, password, role) VALUES ('SVM', 'SVM', 'SERVICE_MANAGER');
+INSERT INTO user (username, password, role) VALUES ('PDM', 'PDM', 'PRODUCTION_MANAGER');
+INSERT INTO user (username, password, role) VALUES ('AUS', 'AUS', 'AUDIO_SPECIALIST');
+INSERT INTO user (username, password, role) VALUES ('TOPC', 'TOPC', 'TOP_CHEF');
 INSERT INTO user (username, password, role) VALUES ('ADM', 'ADM', 'ADMINISTRATION_MANAGER');
 INSERT INTO user (username, password, role) VALUES ('FMM', 'FMM', 'FINANCIAL_MANAGER');
 INSERT INTO user (username, password, role) VALUES ('CSS', 'CSS', 'CUSTOMER_SERVICE');
@@ -25,3 +30,10 @@ CREATE TABLE event (
   status TEXT NOT NULL DEFAULT "NEW"
 );
 
+CREATE TABLE financial_request (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  requestor TEXT NOT NULL,
+  request TEXT NOT NULL,
+  taskId TEXT NOT NULL UNIQUE,
+  status TEXT NOT NULL
+);
