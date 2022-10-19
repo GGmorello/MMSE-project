@@ -21,11 +21,17 @@ def getHiringRequests():
 
     role = user['role']
 
-    if role != "HR_MANAGER":
+    req = None
+    cur = db.cursor()
+
+    if role == "HR_MANAGER":
+        req = cur.execute('SELECT * FROM hiring_request').fetchall()
+    elif role == "SERVICE_MANAGER" or role == "PRODUCTION_MANAGER":
+        req = cur.execute('SELECT * FROM hiring_request WHERE requestor = ?', (role,)).fetchall()
+    
+    if req is None:
         return Response("Unauthorized", status=403)
     
-    cur = db.cursor()
-    req = cur.execute('SELECT * FROM hiring_request').fetchall()
     return req
 
 @bp.route("/hire", methods=['POST'])
