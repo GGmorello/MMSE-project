@@ -133,16 +133,6 @@ def approve():
 @cross_origin()
 def application():
     user, db = init(request)
-
-@bp.route("/requests", methods=['GET'])
-@cross_origin()
-def getFinancialRequests():    
-    user, db = init(request)
-    if user is None:
-        return Response("Invalid user", status=400)
-
-    role = user['role']
-
     if role == 'PRODUCTION_DEPARTMENT_MANAGER' or role == 'SERVICE_DEPARTMENT_MANAGER':
 
         for task in request.json["tasks"]:
@@ -157,6 +147,28 @@ def getFinancialRequests():
 
         return task
     return Response("Unauthorized", 403)
+    
+    
+@bp.route("/requests", methods=['GET'])
+@cross_origin()
+def getFinancialRequests():    
+    user, db = init(request)
+    if user is None:
+        return Response("Invalid user", status=400)
+
+    role = user['role']
+    requests = None
+
+    if role == "FINANCIAL_MANAGER":
+        requests = db.execute('SELECT * FROM financial_request').fetchall()
+    elif role == "SERVICE_MANAGER" or role == "PRODUCTION_MANAGER":
+        requests = db.execute('SELECT * FROM financial_request WHERE requestor = ?', (role,)).fetchall()
+
+    if requests is None:
+        return Response("Unauthorized", 403)
+
+    return requests
+
 
 
 @bp.route("/tasks", methods=['GET', 'POST'])
@@ -204,17 +216,7 @@ def hire():
         ).fetchall()
         return hire
 """
-    requests = None
 
-    if role == "FINANCIAL_MANAGER":
-        requests = db.execute('SELECT * FROM financial_request').fetchall()
-    elif role == "SERVICE_MANAGER" or role == "PRODUCTION_MANAGER":
-        requests = db.execute('SELECT * FROM financial_request WHERE requestor = ?', (role,)).fetchall()
-
-    if requests is None:
-        return Response("Unauthorized", 403)
-
-    return requests
 
 @bp.route("/request/approve", methods=['PUT'])
 @cross_origin()
