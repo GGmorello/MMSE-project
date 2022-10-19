@@ -140,6 +140,8 @@ def getFinancialRequests():
 
     if role == "FINANCIAL_MANAGER":
         requests = db.execute('SELECT * FROM financial_request').fetchall()
+    elif role == "SERVICE_MANAGER" or role == "PRODUCTION_MANAGER":
+        requests = db.execute('SELECT * FROM financial_request WHERE requestor = ?', (role,)).fetchall()
 
     if requests is None:
         return Response("Unauthorized", 403)
