@@ -133,6 +133,11 @@ def approve():
 @cross_origin()
 def application():
     user, db = init(request)
+
+@bp.route("/requests", methods=['GET'])
+@cross_origin()
+def getFinancialRequests():    
+    user, db = init(request)
     if user is None:
         return Response("Invalid user", status=400)
 
@@ -199,6 +204,50 @@ def hire():
         ).fetchall()
         return hire
 """
+    requests = None
+
+    if role == "FINANCIAL_MANAGER":
+        requests = db.execute('SELECT * FROM financial_request').fetchall()
+    elif role == "SERVICE_MANAGER" or role == "PRODUCTION_MANAGER":
+        requests = db.execute('SELECT * FROM financial_request WHERE requestor = ?', (role,)).fetchall()
+
+    if requests is None:
+        return Response("Unauthorized", 403)
+
+    return requests
+
+@bp.route("/request/approve", methods=['PUT'])
+@cross_origin()
+def approveFinancialRequest():
+    
+    user, db = init(request)
+
+    if user is None:
+        return Response("Invalid user", status=400)
+
+    if user['role'] != "FINANCIAL_MANAGER":
+        return Response("Unauthorized", status=403)
+
+    id = request.json["id"]
+    
+    event = db.execute('SELECT * FROM financial_request WHERE id = ?', (id,)).fetchone()
+
+    if event is None:
+        return Response("Bad request - id invalid", status=400)
+    
+    newStatus = ""
+    if request.json["approved"]:
+        newStatus = "APPROVED"
+    else:
+        newStatus = "REJECTED"
+
+    cur = db.cursor()
+    cur.execute(
+        'UPDATE financial_request SET status = ? WHERE id = ?', (newStatus, id,)
+    )
+    db.commit()
+    req = cur.execute('SELECT * FROM financial_request WHERE id = ?', (id,)).fetchone()
+    return req
 
 def init(req):
     token = req.headers['Authorization']
