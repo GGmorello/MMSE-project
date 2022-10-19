@@ -1,4 +1,9 @@
-import { PRODUCTION_DEPARTMENT_SUBTEAMS, Role, SERVICE_DEPARTMENT_SUBTEAMS } from "model";
+import {
+    FinancialRequestStatus,
+    Role,
+    PRODUCTION_DEPARTMENT_SUBTEAMS,
+    SERVICE_DEPARTMENT_SUBTEAMS,
+} from "model";
 
 export function canEditEvents(role: Role): boolean {
     switch (role) {
@@ -39,7 +44,38 @@ export function getRoleLabel(role: Role): string {
         case Role.TOP_CHEF:
             return "Top chef";
         default:
-            console.warn("Unexpected role received - translation not defined", role);
+            console.warn(
+                "Unexpected role received - translation not defined",
+                role,
+            );
             return "NOT_IMPLEMENTED";
+    }
+}
+
+export function canReviewFinancialRequests(role: Role): boolean {
+    switch (role) {
+        case Role.FINANCIAL_MANAGER:
+            return true;
+        default:
+            return false;
+    }
+}
+
+export function getFinancialStatusLabel(
+    status: FinancialRequestStatus,
+): string {
+    switch (status) {
+        case FinancialRequestStatus.APPROVED:
+            return "Approved";
+        case FinancialRequestStatus.REJECTED:
+            return "Rejected";
+        case FinancialRequestStatus.SUBMITTED:
+            return "Submitted";
+        default:
+            console.warn(
+                "Unknown financial status label encountered - cannot determine label",
+                status,
+            );
+            return "Unknown";
     }
 }

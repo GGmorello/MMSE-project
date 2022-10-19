@@ -9,6 +9,7 @@ import {
     Event,
     EventBase,
     Role,
+    FinancialRequest,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -46,6 +47,32 @@ class WebService {
             .get<Event[]>("event")
             .then((res: AxiosResponse<Event[]>) => {
                 const resp: SuccessResponse<Event[]> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async fetchFinancialRequests(): Promise<Response<FinancialRequest[]>> {
+        return await this.instance
+            .get<FinancialRequest[]>("event/requests")
+            .then((res: AxiosResponse<FinancialRequest[]>) => {
+                const resp: SuccessResponse<FinancialRequest[]> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async updateFinancialRequestStatus(id: string, approved: boolean): Promise<Response<FinancialRequest>> {
+        return await this.instance
+            .put<FinancialRequest>("event/request/approve", { id, approved })
+            .then((res: AxiosResponse<FinancialRequest>) => {
+                const resp: SuccessResponse<FinancialRequest> = {
                     type: ResponseType.SUCCESSFUL,
                     data: res.data,
                 };
