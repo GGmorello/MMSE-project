@@ -13,6 +13,7 @@ CREATE TABLE user (
 
 INSERT INTO user (username, password, role) VALUES ('SVM', 'SVM', 'SERVICE_MANAGER');
 INSERT INTO user (username, password, role) VALUES ('PDM', 'PDM', 'PRODUCTION_MANAGER');
+INSERT INTO user (username, password, role) VALUES ('HRM', 'HRM', 'HR_MANAGER');
 INSERT INTO user (username, password, role) VALUES ('AUS', 'AUS', 'AUDIO_SPECIALIST');
 INSERT INTO user (username, password, role) VALUES ('TOPC', 'TOPC', 'TOP_CHEF');
 INSERT INTO user (username, password, role) VALUES ('ADM', 'ADM', 'ADMINISTRATION_MANAGER');
@@ -43,5 +44,6 @@ create table hiring_request (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   requestor TEXT NOT NULL,
   requestedRole TEXT NOT NULL,
-  comment TEXT NOT NULL
+  comment TEXT NOT NULL,
+  status TEXT NOT NULL
 );
