@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 
-import { HiringRequest } from "model";
+import { HiringRequest, MessageType } from "model";
 import { DataGrid, GridColumns, GridSelectionModel } from "@mui/x-data-grid";
 import { Button } from "@mui/material";
-import { getRoleLabel } from "logic/user";
+import { getHiringStatusLabel, getRoleLabel } from "logic/user";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "store/store";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { fetchHiringRequests, updateHiringRequestStatus } from "store/user/userSlice";
+import { addMessage } from "store/message/messageSlice";
 
 interface HiringRequestTableProps {
     canReviewHiringRequests?: boolean;
@@ -14,9 +19,9 @@ interface HiringRequestTableProps {
 const columns: GridColumns<HiringRequest> = [
     {
         field: "submittor",
-        headerName: "Submittor",
+        headerName: "Requestor",
         renderCell: (params) => {
-            return getRoleLabel(params.row.submittor);
+            return getRoleLabel(params.row.requestor);
         },
         width: 200,
     },
@@ -29,6 +34,14 @@ const columns: GridColumns<HiringRequest> = [
         width: 200,
     },
     { field: "comment", headerName: "Comment", width: 300 },
+    {
+        field: "status",
+        headerName: "Status",
+        renderCell: (params) => {
+            return getHiringStatusLabel(params.row.status);
+        },
+        width: 100,
+    },
 ];
 
 export const HiringRequestTable = ({
@@ -36,6 +49,8 @@ export const HiringRequestTable = ({
     items,
     loading,
 }: HiringRequestTableProps): JSX.Element => {
+    const dispatch: AppDispatch = useDispatch();
+
     const [rows, setRows] = useState<HiringRequest[]>(items);
     const [selectedRows, setSelectedRows] = useState<Array<string | number>>(
         [],
@@ -55,7 +70,26 @@ export const HiringRequestTable = ({
         id: string | number,
         approved: boolean,
     ): void => {
-        console.log("review request", id, approved);
+        dispatch(updateHiringRequestStatus({ id: `${id}`, approved }))
+            .then(unwrapResult)
+            .then(() => {
+                dispatch(
+                    addMessage({
+                        type: MessageType.SUCCESS,
+                        message: "Hiring request review was successful",
+                    }),
+                );
+                dispatch(fetchHiringRequests("")).then(() => {}, () => {});
+            })
+            .catch((e) => {
+                console.warn("Hiring request failed unexpectedly", e);
+                dispatch(
+                    addMessage({
+                        type: MessageType.SUCCESS,
+                        message: "Hiring request failed unexpectedly",
+                    }),
+                );
+            });
     };
 
     const handleGetRowId = (req: HiringRequest): string => req.id;

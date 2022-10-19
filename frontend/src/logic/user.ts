@@ -3,6 +3,7 @@ import {
     Role,
     PRODUCTION_DEPARTMENT_SUBTEAMS,
     SERVICE_DEPARTMENT_SUBTEAMS,
+    HiringRequestStatus,
 } from "model";
 
 export function canEditEvents(role: Role): boolean {
@@ -89,6 +90,20 @@ export function getFinancialStatusLabel(
                 "Unknown financial status label encountered - cannot determine label",
                 status,
             );
+            return "Unknown";
+    }
+}
+
+export function getHiringStatusLabel(status: HiringRequestStatus): string {
+    switch (status) {
+        case HiringRequestStatus.APPROVED:
+            return "Approved";
+        case HiringRequestStatus.REJECTED:
+            return "Rejected";
+        case HiringRequestStatus.SUBMITTED:
+            return "Submitted";
+        default:
+            console.warn("Unexpected hiring status received, cannot determine label", status);
             return "Unknown";
     }
 }

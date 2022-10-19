@@ -123,6 +123,38 @@ export const fetchHiringRequests = createAsyncThunk(
     },
 );
 
+interface HiringRequestStatusUpdate {
+    id: string;
+    approved: boolean;
+}
+
+export const updateHiringRequestStatus = createAsyncThunk(
+    "user/hire/approve",
+    async({ id, approved }: HiringRequestStatusUpdate, thunkAPI) => {
+        const state: RootState = thunkAPI.getState() as RootState;
+        const user: User | null = state.user.userData;
+        if (user === null) {
+            console.warn("user data is null - cannot save event");
+            return thunkAPI.rejectWithValue("user is null");
+        }
+        const service: WebService = new WebService(user.access_token);
+        const response: Response<HiringRequest> = await service.updateHiringRequestStatus(id, approved);
+        switch (response.type) {
+            case ResponseType.SUCCESSFUL: {
+                return response.data;
+            }
+            case ResponseType.ERROR:
+                return thunkAPI.rejectWithValue(undefined);
+            default:
+                console.log(
+                    "unexpected return type from login request: ",
+                    response,
+                );
+                return thunkAPI.rejectWithValue(undefined);
+        }
+    },
+);
+
 export const submitHiringRequest = createAsyncThunk(
     "user/hire",
     async ({ requestedRole, comment }: HiringRequestBase, thunkAPI) => {
@@ -201,6 +233,15 @@ export const userSlice = createSlice({
                 state.loading = LoadingState.PENDING;
             })
             .addCase(submitHiringRequest.rejected, (state: UserState) => {
+                state.loading = LoadingState.FAILED;
+            })
+            .addCase(updateHiringRequestStatus.fulfilled, (state: UserState, action) => {
+                state.loading = LoadingState.SUCCEEDED;
+            })
+            .addCase(updateHiringRequestStatus.pending, (state: UserState) => {
+                state.loading = LoadingState.PENDING;
+            })
+            .addCase(updateHiringRequestStatus.rejected, (state: UserState) => {
                 state.loading = LoadingState.FAILED;
             })
             .addCase(fetchFinancialRequests.fulfilled, (state: UserState) => {

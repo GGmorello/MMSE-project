@@ -10,9 +10,16 @@ export interface HiringRequestBase {
     comment: string;
 }
 
+export enum HiringRequestStatus {
+    APPROVED = "APPROVED",
+    REJECTED = "REJECTED",
+    SUBMITTED = "SUBMITTED",
+}
+
 export interface HiringRequest extends HiringRequestBase {
     requestor: Role;
     id: string;
+    status: HiringRequestStatus;
 }
 
 export enum Role {
