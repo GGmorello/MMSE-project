@@ -60,9 +60,9 @@ export const SubmitTaskApplication = (): JSX.Element => {
     const handleSubmitTaskApplication = (): void => {
         dispatch(createTaskApplication(taskApplication))
             .then(unwrapResult)
-            .then((res: TaskApplication) => {
-                // TODO: What to do with task application? Store in state?
-                console.log("task application received", res);
+            .then(() => {
+                setNewTask(createDefaultTask());
+                setTaskApplication(createDefaultTaskApplication());
                 dispatch(
                     addMessage({
                         type: MessageType.SUCCESS,
@@ -159,17 +159,6 @@ export const SubmitTaskApplication = (): JSX.Element => {
                             }}
                         >
                             <FormControl style={{ flex: 1, marginTop: 10 }}>
-                                <InputLabel htmlFor={"description-input"}>
-                                    Description
-                                </InputLabel>
-                                <OutlinedInput
-                                    id="description-input"
-                                    label="description"
-                                    value={newTask.description}
-                                    onChange={onTaskChange("description")}
-                                />
-                            </FormControl>
-                            <FormControl style={{ flex: 1, marginTop: 10 }}>
                                 <InputLabel htmlFor={"subteam-input"}>
                                     Subteam ID
                                 </InputLabel>
@@ -178,6 +167,17 @@ export const SubmitTaskApplication = (): JSX.Element => {
                                     label="Subteam ID"
                                     value={newTask.subteamId}
                                     onChange={onTaskChange("subteamId")}
+                                />
+                            </FormControl>
+                            <FormControl style={{ flex: 1, marginTop: 10 }}>
+                                <InputLabel htmlFor={"description-input"}>
+                                    Description
+                                </InputLabel>
+                                <OutlinedInput
+                                    id="description-input"
+                                    label="description"
+                                    value={newTask.description}
+                                    onChange={onTaskChange("description")}
                                 />
                             </FormControl>
                             <div style={{ marginLeft: 10 }}>

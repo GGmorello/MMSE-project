@@ -147,38 +147,19 @@ class WebService {
             .catch(this.createDefaultErrorResponse);
     }
 
-    async createTaskApplication(
+    async submitTaskApplication(
         application: TaskApplicationBase,
     ): Promise<Response<TaskApplication>> {
-        // TODO: Integrate with backend
-        return await new Promise((resolve, reject) => {
-            setTimeout(() => {
-                const res: SuccessResponse<TaskApplication> = {
+        return await this.instance
+            .post<TaskApplication>("event/application", application)
+            .then((res: AxiosResponse<TaskApplication>) => {
+                const resp: SuccessResponse<TaskApplication> = {
                     type: ResponseType.SUCCESSFUL,
-                    data: {
-                        ...application,
-                        id: "temp-id",
-                        tasks: application.tasks.map(
-                            (t: TaskBase, i: number) => ({
-                                ...t,
-                                id: `task-${i}`,
-                            }),
-                        ),
-                    },
+                    data: res.data,
                 };
-                resolve(res);
-            }, 3000);
-        });
-        // return await this.instance
-        //     .post<TaskApplication>("event/application", application)
-        //     .then((res: AxiosResponse<TaskApplication>) => {
-        //         const resp: SuccessResponse<TaskApplication> = {
-        //             type: ResponseType.SUCCESSFUL,
-        //             data: res.data,
-        //         };
-        //         return resp;
-        //     })
-        //     .catch(this.createDefaultErrorResponse);
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
     }
 
     async submitHiringRequest(requestor: Role, requestedRole: Role, comment: string): Promise<Response<HiringRequest>> {

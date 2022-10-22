@@ -43,6 +43,8 @@ export function getEventStatusLabel(status: EventStatus): string {
             return "Approved by FM";
         case EventStatus.APPROVED_BY_SCSO:
             return "Approved by SCSO";
+        case EventStatus.IN_PROGRESS:
+            return "In progress";
         case EventStatus.NEW:
             return "New";
         case EventStatus.REJECTED_BY_ADM:

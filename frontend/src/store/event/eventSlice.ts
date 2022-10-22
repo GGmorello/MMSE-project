@@ -111,7 +111,7 @@ export const createTaskApplication = createAsyncThunk(
             return thunkAPI.rejectWithValue("user is null");
         }
         const service: WebService = new WebService(user.access_token);
-        const response: Response<TaskApplication> = await service.createTaskApplication(newApplication);
+        const response: Response<TaskApplication> = await service.submitTaskApplication(newApplication);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 return response.data;
