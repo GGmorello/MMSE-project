@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS financial_request;
 DROP TABLE IF EXISTS hiring_request;
 DROP TABLE IF EXISTS event;
+DROP TABLE IF EXISTS tasks;
 
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,6 +23,7 @@ INSERT INTO user (username, password, role) VALUES ('CSS', 'CSS', 'CUSTOMER_SERV
 INSERT INTO user (username, password, role) VALUES ('CLIENT', 'CLIENT', 'CLIENT');
 INSERT INTO user (username, password, role) VALUES ('SCSO', 'SCSO', 'SENIOR_CUSTOMER_SERVICE_OFFICER');
 
+
 CREATE TABLE event (
   id TEXT PRIMARY KEY UNIQUE,
   clientId TEXT NOT NULL,
@@ -30,6 +32,15 @@ CREATE TABLE event (
   reviewNotes TEXT,
   eventRequestItems TEXT,
   status TEXT NOT NULL DEFAULT "NEW"
+);
+
+CREATE TABLE tasks (
+  id TEXT PRIMARY KEY,
+  subteamId TEXT NOT NULL,
+  description TEXT,
+  eventId TEXT NOT NULL,
+  comment TEXT,
+  FOREIGN KEY(eventId) REFERENCES event(id)
 );
 
 CREATE TABLE financial_request (
