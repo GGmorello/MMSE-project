@@ -39,7 +39,7 @@ def create_app(test_config=None):
 
     from flaskr import api
     app.register_blueprint(api.bp)
-    
+
     from flaskr import user
     app.register_blueprint(user.bp)
 
