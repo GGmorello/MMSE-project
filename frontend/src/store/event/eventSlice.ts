@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import WebService from "components/common/WebService";
-import { Event, EventBase, User, Response, ResponseType, LoadingState } from "model";
+import { Event, EventBase, User, Response, ResponseType, LoadingState, TaskApplicationBase, TaskApplication } from "model";
 import { RootState } from "store/store";
 import { logoutUser } from "store/user/userSlice";
 
@@ -101,6 +101,31 @@ export const updateEventStatus = createAsyncThunk(
     },
 );
 
+export const createTaskApplication = createAsyncThunk(
+    "event/createApplication",
+    async (newApplication: TaskApplicationBase, thunkAPI) => {
+        const state: RootState = thunkAPI.getState() as RootState;
+        const user: User | null = state.user.userData;
+        if (user === null) {
+            console.warn("user data is null - cannot save event");
+            return thunkAPI.rejectWithValue("user is null");
+        }
+        const service: WebService = new WebService(user.access_token);
+        const response: Response<TaskApplication> = await service.submitTaskApplication(newApplication);
+        switch (response.type) {
+            case ResponseType.SUCCESSFUL:
+                return response.data;
+            case ResponseType.ERROR:
+                return thunkAPI.rejectWithValue(undefined);
+            default:
+                console.log(
+                    "unexpected return type from login request: ",
+                    response,
+                );
+                return thunkAPI.rejectWithValue(undefined);
+        }
+    });
+
 export const eventSlice = createSlice({
     name: "event",
     initialState,
@@ -141,6 +166,15 @@ export const eventSlice = createSlice({
                 state.loading = LoadingState.PENDING;
             })
             .addCase(fetchEvents.rejected, (state: EventState) => {
+                state.loading = LoadingState.FAILED;
+            })
+            .addCase(createTaskApplication.fulfilled, (state: EventState) => {
+                state.loading = LoadingState.SUCCEEDED;
+            })
+            .addCase(createTaskApplication.pending, (state: EventState) => {
+                state.loading = LoadingState.PENDING;
+            })
+            .addCase(createTaskApplication.rejected, (state: EventState) => {
                 state.loading = LoadingState.FAILED;
             });
     },
