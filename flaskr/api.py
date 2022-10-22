@@ -10,7 +10,6 @@ from flaskr.db import create_connection
 
 bp = Blueprint('event', __name__, url_prefix='/event')
 
-
 @bp.route("/create", methods=['POST'])
 @cross_origin()
 def new_event():
@@ -52,6 +51,8 @@ def retrieve():
         statuses = "APPROVED_BY_SCSO"
     elif role == "ADMINISTRATION_MANAGER":
         statuses = "APPROVED_BY_FM"
+    elif role == "PRODUCTION_MANAGER" or role == "SERVICE_MANAGER":
+        statuses = "IN_PROGRESS"
 
     if statuses is None:
         return Response("Unauthorized", status=403)
@@ -112,7 +113,9 @@ def approve():
             return Response("Unauthorized - current event status is not 'APPROVED_BY_FM'", status=403)
 
         if approved == True:
-            newStatus = "APPROVED_BY_ADM"
+            # we bypass the "schedule meeting" with client
+            # and assume that they always come to an agreement
+            newStatus = "IN_PROGRESS"
         else:
             newStatus = "REJECTED_BY_ADM"
         comment = request.json["reviewNotes"]
@@ -140,11 +143,11 @@ def application():
             identifier = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24))
             db.cursor().execute(
                 'INSERT INTO tasks (id, subteamId, description, eventId) VALUES (?,?,?,?)', (
-                    identifier, task['subteamId'], task['description'], request.args['eventId'])
+                    identifier, task['subteamId'], task['description'], request.json['eventId'])
             )
             db.commit()
 
-        task = db.execute('SELECT * FROM tasks WHERE eventId = ?', (request.args['eventId'],)).fetchall()
+        task = db.execute('SELECT * FROM tasks WHERE eventId = ?', (request.json['eventId'],)).fetchall()
 
         return task
     return Response("Unauthorized", 403)
@@ -191,32 +194,6 @@ def get_tasks():
     ).fetchall()
 
     return {'tasks': tasks}
-
-
-bphr = Blueprint('hr', __name__)
-
-"""
-@bp.route("/hr/hire", methods=['POST'])
-@cross_origin()
-def hire():
-    user, db = init(request)
-    if user is None:
-        return Response("Invalid user", status=400)
-    role = user['role']
-    if role == 'PRODUCTION_DEPARTMENT_MANAGER' or role == 'SERVICE_DEPARTMENT_MANAGER':
-        identifier = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24))
-
-        db.cursor().execute(
-            'INSERT INTO hr (id, subteamId, comment) VALUES (?,?,?)', (
-                identifier, request.json['subteamId'], request.json['comment'])
-        )
-        db.commit()
-        hire = db.cursor().execute(
-            'SELECT * FROM hr WHERE id = ?',
-            (identifier,)
-        ).fetchall()
-        return hire
-"""
 
 
 @bp.route("/request/approve", methods=['PUT'])

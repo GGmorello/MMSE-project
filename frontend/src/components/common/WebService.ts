@@ -8,6 +8,9 @@ import {
     User,
     Event,
     EventBase,
+    TaskApplicationBase,
+    TaskApplication,
+    TaskBase,
     Role,
     FinancialRequest,
     HiringRequest,
@@ -136,6 +139,21 @@ class WebService {
             .put<Event>("event/approve", { id, approved, reviewNotes })
             .then((res: AxiosResponse<Event>) => {
                 const resp: SuccessResponse<Event> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async submitTaskApplication(
+        application: TaskApplicationBase,
+    ): Promise<Response<TaskApplication>> {
+        return await this.instance
+            .post<TaskApplication>("event/application", application)
+            .then((res: AxiosResponse<TaskApplication>) => {
+                const resp: SuccessResponse<TaskApplication> = {
                     type: ResponseType.SUCCESSFUL,
                     data: res.data,
                 };

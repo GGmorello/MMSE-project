@@ -12,6 +12,7 @@ import { BrowseEventRequests } from "./browseEventRequests/BrowseEventRequests";
 import { BrowseHiringRequests } from "./browseHiringRequests/BrowseHiringRequests";
 import { BrowseFinancialRequests } from "./browseFinancialRequests/BrowseFinancialRequests";
 import { SubmitEventRequest } from "./submitEventRequest/SubmitEventRequest";
+import { SubmitTaskApplication } from "./submitTaskApplication/SubmitTaskApplication";
 import { SubmitHiringRequest } from "./submitHiringRequest/SubmitHiringRequest";
 
 export const Home = (): JSX.Element => {
@@ -71,6 +72,8 @@ export const Home = (): JSX.Element => {
                 return <SubmitEventRequest />;
             case Page.SUBMIT_HIRING_REQUEST:
                 return <SubmitHiringRequest />;
+            case Page.SUBMIT_TASK_APPLICATION:
+                return <SubmitTaskApplication />;
             default:
                 console.warn(
                     "Unexpected page received, cannot calculate correct page component",
