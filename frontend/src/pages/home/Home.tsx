@@ -9,8 +9,11 @@ import { addMessage } from "store/message/messageSlice";
 import { AppDispatch, RootState } from "store/store";
 import { logoutUser } from "store/user/userSlice";
 import { BrowseEventRequests } from "./browseEventRequests/BrowseEventRequests";
+import { BrowseHiringRequests } from "./browseHiringRequests/BrowseHiringRequests";
+import { BrowseFinancialRequests } from "./browseFinancialRequests/BrowseFinancialRequests";
 import { SubmitEventRequest } from "./submitEventRequest/SubmitEventRequest";
 import { SubmitTaskApplication } from "./submitTaskApplication/SubmitTaskApplication";
+import { SubmitHiringRequest } from "./submitHiringRequest/SubmitHiringRequest";
 
 export const Home = (): JSX.Element => {
     const dispatch: AppDispatch = useDispatch();
@@ -61,8 +64,14 @@ export const Home = (): JSX.Element => {
         switch (page) {
             case Page.BROWSE_EVENT_REQUEST:
                 return <BrowseEventRequests />;
+            case Page.BROWSE_HIRING_REQUEST:
+                return <BrowseHiringRequests />;
+            case Page.BROWSE_FINANCIAL_REQUEST:
+                return <BrowseFinancialRequests />;
             case Page.SUBMIT_EVENT_REQUEST:
                 return <SubmitEventRequest />;
+            case Page.SUBMIT_HIRING_REQUEST:
+                return <SubmitHiringRequest />;
             case Page.SUBMIT_TASK_APPLICATION:
                 return <SubmitTaskApplication />;
             default:

@@ -139,6 +139,7 @@ export const eventSlice = createSlice({
             .addCase(logoutUser.fulfilled, (state: EventState) => {
                 state.creating = LoadingState.IDLE;
                 state.loading = LoadingState.IDLE;
+                state.events = [];
             })
             .addCase(createEvent.fulfilled, (state: EventState) => {
                 state.creating = LoadingState.SUCCEEDED;

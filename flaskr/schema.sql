@@ -1,5 +1,8 @@
 DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS financial_request;
+DROP TABLE IF EXISTS hiring_request;
 DROP TABLE IF EXISTS event;
+DROP TABLE IF EXISTS tasks;
 
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -9,14 +12,17 @@ CREATE TABLE user (
   access_token TEXT DEFAULT (RANDOM())
 );
 
-
 INSERT INTO user (username, password, role) VALUES ('SVM', 'SVM', 'SERVICE_MANAGER');
-INSERT INTO user (username, password, role) VALUES ('PDM', 'PDM', 'PRODUCTION_AMANGER');
+INSERT INTO user (username, password, role) VALUES ('PDM', 'PDM', 'PRODUCTION_MANAGER');
+INSERT INTO user (username, password, role) VALUES ('HRM', 'HRM', 'HR_MANAGER');
+INSERT INTO user (username, password, role) VALUES ('AUS', 'AUS', 'AUDIO_SPECIALIST');
+INSERT INTO user (username, password, role) VALUES ('TOPC', 'TOPC', 'TOP_CHEF');
 INSERT INTO user (username, password, role) VALUES ('ADM', 'ADM', 'ADMINISTRATION_MANAGER');
 INSERT INTO user (username, password, role) VALUES ('FMM', 'FMM', 'FINANCIAL_MANAGER');
 INSERT INTO user (username, password, role) VALUES ('CSS', 'CSS', 'CUSTOMER_SERVICE');
 INSERT INTO user (username, password, role) VALUES ('CLIENT', 'CLIENT', 'CLIENT');
 INSERT INTO user (username, password, role) VALUES ('SCSO', 'SCSO', 'SENIOR_CUSTOMER_SERVICE_OFFICER');
+
 
 CREATE TABLE event (
   id TEXT PRIMARY KEY UNIQUE,
@@ -28,3 +34,27 @@ CREATE TABLE event (
   status TEXT NOT NULL DEFAULT "NEW"
 );
 
+CREATE TABLE tasks (
+  id TEXT PRIMARY KEY,
+  subteamId TEXT NOT NULL,
+  description TEXT,
+  eventId TEXT NOT NULL,
+  comment TEXT,
+  FOREIGN KEY(eventId) REFERENCES event(id)
+);
+
+CREATE TABLE financial_request (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  requestor TEXT NOT NULL,
+  request TEXT NOT NULL,
+  taskId TEXT NOT NULL UNIQUE,
+  status TEXT NOT NULL
+);
+
+create table hiring_request (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  requestor TEXT NOT NULL,
+  requestedRole TEXT NOT NULL,
+  comment TEXT NOT NULL,
+  status TEXT NOT NULL
+);

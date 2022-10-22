@@ -1,3 +1,5 @@
+import { Role } from "model";
+
 export interface EventRequestItem {
     requestId: number;
     description: string;
@@ -44,4 +46,21 @@ export interface TaskBase {
 
 export interface Task extends TaskBase {
     id: string;
+}
+
+export enum FinancialRequestStatus {
+    APPROVED = "APPROVED",
+    REJECTED = "REJECTED",
+    SUBMITTED = "SUBMITTED",
+}
+
+export interface FinancialRequestBase {
+    taskId: string;
+    request: string;
+    status: FinancialRequestStatus;
+}
+
+export interface FinancialRequest extends FinancialRequestBase {
+    id: string;
+    submittor: Role;
 }

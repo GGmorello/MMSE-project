@@ -10,10 +10,10 @@ from flaskr.db import create_connection
 
 bp = Blueprint('event', __name__, url_prefix='/event')
 
+
 @bp.route("/create", methods=['POST'])
 @cross_origin()
 def new_event():
-
     user, db = init(request)
 
     if user is None:
@@ -23,8 +23,10 @@ def new_event():
 
         identifier = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24))
 
-        db.cursor().execute('INSERT INTO event (id, clientId, startDate, endDate, eventRequestItems) VALUES (?,?,?,?,?)',
-                   (identifier, request.json['clientId'], request.json['startDate'], request.json['endDate'], repr(request.json['eventRequestItems'])))
+        db.cursor().execute(
+            'INSERT INTO event (id, clientId, startDate, endDate, eventRequestItems) VALUES (?,?,?,?,?)',
+            (identifier, request.json['clientId'], request.json['startDate'], request.json['endDate'],
+             repr(request.json['eventRequestItems'])))
         db.commit()
         event = db.cursor().execute('SELECT * FROM event WHERE id = ?', (identifier,)).fetchone()
         event['eventRequestItems'] = eval(event['eventRequestItems'])
@@ -37,7 +39,6 @@ def new_event():
 @bp.route('', methods=['GET'])
 @cross_origin()
 def retrieve():
-
     user, db = init(request)
 
     if user is None:
@@ -54,7 +55,7 @@ def retrieve():
 
     if statuses is None:
         return Response("Unauthorized", status=403)
-    
+
     event = db.cursor().execute(
         'SELECT * FROM event WHERE status IN (?)', (statuses,),
     ).fetchall()
@@ -64,10 +65,10 @@ def retrieve():
 
     return event
 
+
 @bp.route("/approve", methods=['PUT'])
 @cross_origin()
 def approve():
-
     user, db = init(request)
 
     newStatus = None
@@ -78,7 +79,7 @@ def approve():
         return Response("Invalid user", status=400)
 
     id = request.json["id"]
-    
+
     event = db.execute('SELECT * FROM event WHERE id = ?', (id,)).fetchone()
 
     if event is None:
@@ -86,7 +87,7 @@ def approve():
 
     role = user['role']
     status = event['status']
-    
+
     if role == "SENIOR_CUSTOMER_SERVICE_OFFICER":
         if (status != 'NEW'):
             return Response("Unauthorized - current event status is not 'NEW'", status=403)
@@ -105,11 +106,11 @@ def approve():
         else:
             newStatus = "REJECTED_BY_FM"
         comment = request.json["reviewNotes"]
-    
+
     elif role == "ADMINISTRATION_MANAGER":
         if (status != 'APPROVED_BY_FM'):
             return Response("Unauthorized - current event status is not 'APPROVED_BY_FM'", status=403)
-        
+
         if approved == True:
             newStatus = "APPROVED_BY_ADM"
         else:
@@ -126,6 +127,130 @@ def approve():
     event = db.execute('SELECT * FROM event WHERE id = ?', (id,)).fetchone()
     event['eventRequestItems'] = eval(event['eventRequestItems'])
     return event
+
+
+@bp.route("/application", methods=['POST'])
+@cross_origin()
+def application():
+    user, db = init(request)
+    role = user['role']
+    if role == 'PRODUCTION_MANAGER' or role == 'SERVICE_MANAGER':
+
+        for task in request.json["tasks"]:
+            identifier = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24))
+            db.cursor().execute(
+                'INSERT INTO tasks (id, subteamId, description, eventId) VALUES (?,?,?,?)', (
+                    identifier, task['subteamId'], task['description'], request.args['eventId'])
+            )
+            db.commit()
+
+        task = db.execute('SELECT * FROM tasks WHERE eventId = ?', (request.args['eventId'],)).fetchall()
+
+        return task
+    return Response("Unauthorized", 403)
+    
+    
+@bp.route("/requests", methods=['GET'])
+@cross_origin()
+def getFinancialRequests():    
+    user, db = init(request)
+    if user is None:
+        return Response("Invalid user", status=400)
+
+    role = user['role']
+    requests = None
+
+    if role == "FINANCIAL_MANAGER":
+        requests = db.execute('SELECT * FROM financial_request').fetchall()
+    elif role == "SERVICE_MANAGER" or role == "PRODUCTION_MANAGER":
+        requests = db.execute('SELECT * FROM financial_request WHERE requestor = ?', (role,)).fetchall()
+
+    if requests is None:
+        return Response("Unauthorized", 403)
+
+    return requests
+
+
+
+@bp.route("/tasks", methods=['GET', 'POST'])
+@cross_origin()
+def get_tasks():
+    user, db = init(request)
+    if user is None:
+        return Response("Invalid user", status=400)
+
+    elif request.method == 'POST':
+        db.cursor().execute(
+            'UPDATE tasks SET comment = ? WHERE subteamId = ? AND eventId = ? AND id = ?',
+            (request.json['comment'], request.args['subteamId'], request.args['eventId'], request.args["taskId"])
+        )
+        db.commit()
+
+    tasks = db.cursor().execute(
+        'SELECT * FROM tasks WHERE subteamId = ? AND eventId = ?', (request.args['subteamId'], request.args['eventId'])
+    ).fetchall()
+
+    return {'tasks': tasks}
+
+
+bphr = Blueprint('hr', __name__)
+
+"""
+@bp.route("/hr/hire", methods=['POST'])
+@cross_origin()
+def hire():
+    user, db = init(request)
+    if user is None:
+        return Response("Invalid user", status=400)
+    role = user['role']
+    if role == 'PRODUCTION_DEPARTMENT_MANAGER' or role == 'SERVICE_DEPARTMENT_MANAGER':
+        identifier = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24))
+
+        db.cursor().execute(
+            'INSERT INTO hr (id, subteamId, comment) VALUES (?,?,?)', (
+                identifier, request.json['subteamId'], request.json['comment'])
+        )
+        db.commit()
+        hire = db.cursor().execute(
+            'SELECT * FROM hr WHERE id = ?',
+            (identifier,)
+        ).fetchall()
+        return hire
+"""
+
+
+@bp.route("/request/approve", methods=['PUT'])
+@cross_origin()
+def approveFinancialRequest():
+    
+    user, db = init(request)
+
+    if user is None:
+        return Response("Invalid user", status=400)
+
+    if user['role'] != "FINANCIAL_MANAGER":
+        return Response("Unauthorized", status=403)
+
+    id = request.json["id"]
+    
+    event = db.execute('SELECT * FROM financial_request WHERE id = ?', (id,)).fetchone()
+
+    if event is None:
+        return Response("Bad request - id invalid", status=400)
+    
+    newStatus = ""
+    if request.json["approved"]:
+        newStatus = "APPROVED"
+    else:
+        newStatus = "REJECTED"
+
+    cur = db.cursor()
+    cur.execute(
+        'UPDATE financial_request SET status = ? WHERE id = ?', (newStatus, id,)
+    )
+    db.commit()
+    req = cur.execute('SELECT * FROM financial_request WHERE id = ?', (id,)).fetchone()
+    return req
 
 def init(req):
     token = req.headers['Authorization']
