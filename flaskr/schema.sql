@@ -3,7 +3,6 @@ DROP TABLE IF EXISTS financial_request;
 DROP TABLE IF EXISTS hiring_request;
 DROP TABLE IF EXISTS event;
 DROP TABLE IF EXISTS tasks;
-DROP TABLE IF EXISTS hr;
 
 CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,8 +22,6 @@ INSERT INTO user (username, password, role) VALUES ('FMM', 'FMM', 'FINANCIAL_MAN
 INSERT INTO user (username, password, role) VALUES ('CSS', 'CSS', 'CUSTOMER_SERVICE');
 INSERT INTO user (username, password, role) VALUES ('CLIENT', 'CLIENT', 'CLIENT');
 INSERT INTO user (username, password, role) VALUES ('SCSO', 'SCSO', 'SENIOR_CUSTOMER_SERVICE_OFFICER');
-INSERT INTO user (username, password, role) VALUES ('PM', 'PM', 'PRODUCTION_DEPARTMENT_MANAGER');
-INSERT INTO user (username, password, role) VALUES ('SM', 'SM', 'SERVICE_DEPARTMENT_MANAGER');
 
 
 CREATE TABLE event (

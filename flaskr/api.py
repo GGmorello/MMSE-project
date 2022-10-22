@@ -133,7 +133,8 @@ def approve():
 @cross_origin()
 def application():
     user, db = init(request)
-    if role == 'PRODUCTION_DEPARTMENT_MANAGER' or role == 'SERVICE_DEPARTMENT_MANAGER':
+    role = user['role']
+    if role == 'PRODUCTION_MANAGER' or role == 'SERVICE_MANAGER':
 
         for task in request.json["tasks"]:
             identifier = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(24))
