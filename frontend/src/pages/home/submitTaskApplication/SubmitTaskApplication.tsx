@@ -94,7 +94,7 @@ export const SubmitTaskApplication = (): JSX.Element => {
         }
 
         const max: number = Math.max(
-            ...taskApplication.tasks.map((e) => e.taskId),
+            ...taskApplication.tasks.map((e) => Number(e.taskId)),
         );
         const next: TaskBase = {
             ...newTask,

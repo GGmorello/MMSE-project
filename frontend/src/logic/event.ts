@@ -32,6 +32,7 @@ export function createDefaultTask(): TaskBase {
         eventId: "",
         subteamId: Subteam.CHEFS,
         description: "",
+        comment: "",
     };
     return task;
 }
