@@ -9,12 +9,18 @@ export function getRolePages(role: Role): Page[] {
             return [Page.BROWSE_EVENT_REQUEST, ...departmentPages];
         case Role.CUSTOMER_SERVICE:
             return [Page.SUBMIT_EVENT_REQUEST, ...departmentPages];
-        case Role.TOP_CHEF:
-            return [...departmentPages];
         case Role.FINANCIAL_MANAGER:
-            return [Page.BROWSE_EVENT_REQUEST, ...departmentPages];
+            return [Page.BROWSE_EVENT_REQUEST, Page.BROWSE_FINANCIAL_REQUEST, ...departmentPages];
+        case Role.HR_MANAGER:
+            return [Page.BROWSE_HIRING_REQUEST];
+        case Role.PRODUCTION_MANAGER:
+            return [Page.BROWSE_EVENT_REQUEST, Page.BROWSE_FINANCIAL_REQUEST, Page.BROWSE_HIRING_REQUEST, Page.SUBMIT_TASK_APPLICATION, Page.SUBMIT_HIRING_REQUEST];
         case Role.SENIOR_CUSTOMER_SERVICE_OFFICER:
             return [Page.BROWSE_EVENT_REQUEST, ...departmentPages];
+        case Role.TOP_CHEF:
+            return [...departmentPages];
+        case Role.SERVICE_MANAGER:
+            return [Page.BROWSE_EVENT_REQUEST, Page.BROWSE_FINANCIAL_REQUEST, Page.BROWSE_HIRING_REQUEST, Page.SUBMIT_TASK_APPLICATION, Page.SUBMIT_HIRING_REQUEST];
         default:
             console.warn(
                 "Unexpected role received, cannot calculate routes.",
@@ -40,10 +46,18 @@ export function getPageLabel(page: Page): string {
     switch (page) {
         case Page.BROWSE_EVENT_REQUEST:
             return "Browse event requests";
+        case Page.BROWSE_FINANCIAL_REQUEST:
+            return "Browse financial requests";
+        case Page.BROWSE_HIRING_REQUEST:
+            return "Browse hiring requests";
         case Page.BROWSE_TEAM_TASKS:
             return "Browse team tasks";
         case Page.SUBMIT_EVENT_REQUEST:
             return "Submit event request";
+        case Page.SUBMIT_HIRING_REQUEST:
+            return "Submit hiring request";
+        case Page.SUBMIT_TASK_APPLICATION:
+            return "Submit task application";
         default:
             console.warn(
                 "Unexpected page received, cannot calculate route label:",

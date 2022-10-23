@@ -10,6 +10,12 @@ import {
     EventBase,
     Task,
     Subteam,
+    TaskApplicationBase,
+    TaskApplication,
+    TaskBase,
+    Role,
+    FinancialRequest,
+    HiringRequest,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -55,6 +61,64 @@ class WebService {
             .catch(this.createDefaultErrorResponse);
     }
 
+    async fetchHiringRequests(): Promise<Response<HiringRequest[]>> {
+        return await this.instance
+            .get<HiringRequest[]>("user/hire")
+            .then((res: AxiosResponse<HiringRequest[]>) => {
+                const resp: SuccessResponse<HiringRequest[]> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async fetchFinancialRequests(): Promise<Response<FinancialRequest[]>> {
+        return await this.instance
+            .get<FinancialRequest[]>("event/requests")
+            .then((res: AxiosResponse<FinancialRequest[]>) => {
+                const resp: SuccessResponse<FinancialRequest[]> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async updateFinancialRequestStatus(
+        id: string,
+        approved: boolean,
+    ): Promise<Response<FinancialRequest>> {
+        return await this.instance
+            .put<FinancialRequest>("event/request/approve", { id, approved })
+            .then((res: AxiosResponse<FinancialRequest>) => {
+                const resp: SuccessResponse<FinancialRequest> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async updateHiringRequestStatus(
+        id: string,
+        approved: boolean,
+    ): Promise<Response<HiringRequest>> {
+        return await this.instance
+            .put<HiringRequest>("user/hire/approve", { id, approved })
+            .then((res: AxiosResponse<HiringRequest>) => {
+                const resp: SuccessResponse<HiringRequest> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
     async createEvent(event: EventBase): Promise<Response<Event>> {
         const params: { [key: string]: any } = {
             clientId: event.clientId,
@@ -92,40 +156,52 @@ class WebService {
     }
 
     async fetchTasks(): Promise<Response<Task[]>> {
-        return await new Promise((resolve) => {
-            setTimeout(() => {
-                const mockResponse: Response<Task[]> = {
+        return await this.instance
+            .get<Task[]>("event/tasks")
+            .then((res: AxiosResponse<Task[]>) => {
+                const resp: SuccessResponse<Task[]> = {
                     type: ResponseType.SUCCESSFUL,
-                    data: [
-                        {
-                            id: "123",
-                            eventId: "mock event",
-                            subteamId: Subteam.CHEFS,
-                            taskId: 1,
-                            description: "chef task",
-                        },
-                        {
-                            id: "456",
-                            eventId: "mock event",
-                            subteamId: Subteam.AUDIO_SPECIALIST,
-                            taskId: 2,
-                            description: "audio specialist task",
-                        },
-                    ],
+                    data: res.data,
                 };
-                resolve(mockResponse);
-            }, 3000);
-        });
-        // return await this.instance
-        //     .get<Task[]>("event/tasks")
-        //     .then((res: AxiosResponse<Task[]>) => {
-        //         const resp: SuccessResponse<Task[]> = {
-        //             type: ResponseType.SUCCESSFUL,
-        //             data: res.data,
-        //         };
-        //         return resp;
-        //     })
-        //     .catch(this.createDefaultErrorResponse);
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async submitTaskApplication(
+        application: TaskApplicationBase,
+    ): Promise<Response<TaskApplication>> {
+        return await this.instance
+            .post<TaskApplication>("event/application", application)
+            .then((res: AxiosResponse<TaskApplication>) => {
+                const resp: SuccessResponse<TaskApplication> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async submitHiringRequest(
+        requestor: Role,
+        requestedRole: Role,
+        comment: string,
+    ): Promise<Response<HiringRequest>> {
+        return await this.instance
+            .post<HiringRequest>("user/hire", {
+                requestor,
+                requestedRole,
+                comment,
+            })
+            .then((res: AxiosResponse<HiringRequest>) => {
+                const resp: SuccessResponse<HiringRequest> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
     }
 
     private createDefaultErrorResponse(

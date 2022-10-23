@@ -5,6 +5,23 @@ export interface User {
     role: Role;
 }
 
+export interface HiringRequestBase {
+    requestedRole: Role;
+    comment: string;
+}
+
+export enum HiringRequestStatus {
+    APPROVED = "APPROVED",
+    REJECTED = "REJECTED",
+    SUBMITTED = "SUBMITTED",
+}
+
+export interface HiringRequest extends HiringRequestBase {
+    requestor: Role;
+    id: string;
+    status: HiringRequestStatus;
+}
+
 export enum Role {
     ADMINISTRATION_MANAGER = "ADMINISTRATION_MANAGER",
     AUDIO_SPECIALIST = "AUDIO_SPECIALIST",

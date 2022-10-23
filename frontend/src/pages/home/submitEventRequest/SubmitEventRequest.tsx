@@ -42,6 +42,7 @@ export const SubmitEventRequest = (): JSX.Element => {
 
     const changeValue = (key: keyof EventBase, value: any): void =>
         setNewEvent({ ...newEvent, [key]: value });
+
     const onChange = (key: keyof EventBase) => (e: any) =>
         changeValue(key, e.target.value);
 
