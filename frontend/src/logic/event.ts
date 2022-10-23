@@ -1,5 +1,5 @@
 import { formatISO } from "date-fns";
-import { EventBase, EventStatus, TaskApplicationBase, TaskBase } from "model";
+import { EventBase, EventStatus, Subteam, TaskApplicationBase, TaskBase } from "model";
 
 /**
  * Creates a default event for the provided user
@@ -29,7 +29,8 @@ export function createDefaultTaskApplication(): TaskApplicationBase {
 export function createDefaultTask(): TaskBase {
     const task: TaskBase = {
         taskId: 0,
-        subteamId: "",
+        eventId: "",
+        subteamId: Subteam.CHEFS,
         description: "",
     };
     return task;

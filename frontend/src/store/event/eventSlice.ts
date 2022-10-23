@@ -131,15 +131,16 @@ export const fetchTasks = createAsyncThunk(
             return thunkAPI.rejectWithValue("user is null");
         }
         const service: WebService = new WebService(user.access_token);
-        const response: Response<Task[]> = await service.fetchTasks();
+        const response: Response<Task[]> = await service.fetchTasks(user.role);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
-                // temp filtering since webservice hardcodes tasks
                 // eslint-disable-next-line no-case-declarations
-                const filtered: Task[] = response.data.filter((t: Task) => {
-                    return getSubteamRoles(t.subteamId).includes(user.role);
-                });
-                thunkAPI.dispatch(setTasks(filtered));
+                const mapped: Task[] = response.data.map((t: Task, i) => ({
+                    ...t,
+                    taskId: i,
+                }));
+                thunkAPI.dispatch(setTasks(mapped));
+                return mapped;
             case ResponseType.ERROR:
                 return thunkAPI.rejectWithValue(undefined);
             default:
@@ -194,6 +195,7 @@ export const eventSlice = createSlice({
             .addCase(logoutUser.fulfilled, (state: EventState) => {
                 state.creating = LoadingState.IDLE;
                 state.loading = LoadingState.IDLE;
+                state.tasks = [];
                 state.events = [];
             })
             .addCase(createEvent.fulfilled, (state: EventState) => {

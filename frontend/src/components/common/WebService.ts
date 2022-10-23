@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 import axios, { Axios, AxiosResponse } from "axios";
 
 import {
@@ -9,10 +10,8 @@ import {
     Event,
     EventBase,
     Task,
-    Subteam,
     TaskApplicationBase,
     TaskApplication,
-    TaskBase,
     Role,
     FinancialRequest,
     HiringRequest,
@@ -155,9 +154,9 @@ class WebService {
             .catch(this.createDefaultErrorResponse);
     }
 
-    async fetchTasks(): Promise<Response<Task[]>> {
+    async fetchTasks(subteamId: string): Promise<Response<Task[]>> {
         return await this.instance
-            .get<Task[]>("event/tasks")
+            .get<Task[]>("event/tasks?subteamId=" + subteamId)
             .then((res: AxiosResponse<Task[]>) => {
                 const resp: SuccessResponse<Task[]> = {
                     type: ResponseType.SUCCESSFUL,

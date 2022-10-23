@@ -17,6 +17,8 @@ const columns: Array<{
 }> = [
     { field: "subteamId", headerName: "Subteam ID", width: 130 },
     { field: "description", headerName: "Description", width: 230 },
+    { field: "eventId", headerName: "Event ID", width: 230 },
+    { field: "taskId", headerName: "Task ID", width: 230 },
 ];
 
 export const TaskItemTable = ({
@@ -50,7 +52,7 @@ export const TaskItemTable = ({
         setSelectedRows([]);
     };
 
-    const handleGetRowId = (event: TaskBase): number => event.taskId;
+    const handleGetRowId = (task: TaskBase): number => task.taskId;
 
     return (
         <div style={{ width: "100%" }}>
