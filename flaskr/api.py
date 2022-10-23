@@ -190,10 +190,10 @@ def get_tasks():
         db.commit()
 
     tasks = db.cursor().execute(
-        'SELECT * FROM tasks WHERE subteamId = ? AND eventId = ?', (request.args['subteamId'], request.args['eventId'])
+        'SELECT * FROM tasks WHERE subteamId = ?', (request.args['subteamId'],)
     ).fetchall()
 
-    return {'tasks': tasks}
+    return tasks
 
 
 @bp.route("/request/approve", methods=['PUT'])
