@@ -9,6 +9,7 @@ import { addMessage } from "store/message/messageSlice";
 import { AppDispatch, RootState } from "store/store";
 import { logoutUser } from "store/user/userSlice";
 import { BrowseEventRequests } from "./browseEventRequests/BrowseEventRequests";
+import { BrowseTeamTasks } from "./browseTeamTasks/BrowseTeamTasks";
 import { BrowseHiringRequests } from "./browseHiringRequests/BrowseHiringRequests";
 import { BrowseFinancialRequests } from "./browseFinancialRequests/BrowseFinancialRequests";
 import { SubmitEventRequest } from "./submitEventRequest/SubmitEventRequest";
@@ -68,6 +69,8 @@ export const Home = (): JSX.Element => {
                 return <BrowseHiringRequests />;
             case Page.BROWSE_FINANCIAL_REQUEST:
                 return <BrowseFinancialRequests />;
+            case Page.BROWSE_TEAM_TASKS:
+                return <BrowseTeamTasks />;
             case Page.SUBMIT_EVENT_REQUEST:
                 return <SubmitEventRequest />;
             case Page.SUBMIT_HIRING_REQUEST:

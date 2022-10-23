@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 import axios, { Axios, AxiosResponse } from "axios";
 
 import {
@@ -8,9 +9,9 @@ import {
     User,
     Event,
     EventBase,
+    Task,
     TaskApplicationBase,
     TaskApplication,
-    TaskBase,
     Role,
     FinancialRequest,
     HiringRequest,
@@ -85,7 +86,10 @@ class WebService {
             .catch(this.createDefaultErrorResponse);
     }
 
-    async updateFinancialRequestStatus(id: string, approved: boolean): Promise<Response<FinancialRequest>> {
+    async updateFinancialRequestStatus(
+        id: string,
+        approved: boolean,
+    ): Promise<Response<FinancialRequest>> {
         return await this.instance
             .put<FinancialRequest>("event/request/approve", { id, approved })
             .then((res: AxiosResponse<FinancialRequest>) => {
@@ -98,7 +102,10 @@ class WebService {
             .catch(this.createDefaultErrorResponse);
     }
 
-    async updateHiringRequestStatus(id: string, approved: boolean): Promise<Response<HiringRequest>> {
+    async updateHiringRequestStatus(
+        id: string,
+        approved: boolean,
+    ): Promise<Response<HiringRequest>> {
         return await this.instance
             .put<HiringRequest>("user/hire/approve", { id, approved })
             .then((res: AxiosResponse<HiringRequest>) => {
@@ -147,6 +154,19 @@ class WebService {
             .catch(this.createDefaultErrorResponse);
     }
 
+    async fetchTasks(subteamId: string): Promise<Response<Task[]>> {
+        return await this.instance
+            .get<Task[]>("event/tasks?subteamId=" + subteamId)
+            .then((res: AxiosResponse<Task[]>) => {
+                const resp: SuccessResponse<Task[]> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
     async submitTaskApplication(
         application: TaskApplicationBase,
     ): Promise<Response<TaskApplication>> {
@@ -162,9 +182,17 @@ class WebService {
             .catch(this.createDefaultErrorResponse);
     }
 
-    async submitHiringRequest(requestor: Role, requestedRole: Role, comment: string): Promise<Response<HiringRequest>> {
+    async submitHiringRequest(
+        requestor: Role,
+        requestedRole: Role,
+        comment: string,
+    ): Promise<Response<HiringRequest>> {
         return await this.instance
-            .post<HiringRequest>("user/hire", { requestor, requestedRole, comment })
+            .post<HiringRequest>("user/hire", {
+                requestor,
+                requestedRole,
+                comment,
+            })
             .then((res: AxiosResponse<HiringRequest>) => {
                 const resp: SuccessResponse<HiringRequest> = {
                     type: ResponseType.SUCCESSFUL,

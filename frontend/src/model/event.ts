@@ -1,4 +1,4 @@
-import { Role } from "model";
+import { Subteam, Role } from "model";
 
 export interface EventRequestItem {
     requestId: number;
@@ -41,7 +41,8 @@ export interface TaskApplication extends TaskApplicationBase {
 
 export interface TaskBase {
     taskId: number;
-    subteamId: string;
+    eventId: string;
+    subteamId: Subteam;
     description: string;
 }
 
