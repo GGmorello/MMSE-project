@@ -3,14 +3,14 @@ import React, { useEffect, useState } from "react";
 import { MessageType, TaskBase } from "model";
 import { DataGrid, GridSelectionModel } from "@mui/x-data-grid";
 import { Button, FormControl, InputLabel, OutlinedInput } from "@mui/material";
-import { useDispatch } from "react-redux";
 import { AppDispatch } from "store/store";
 import { submitTaskRequest } from "store/event/eventSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { addMessage } from "store/message/messageSlice";
+import { useDispatch } from "react-redux";
 
 interface TaskItemTableProps {
-    canRaiseRequest?: boolean;
+    canRaiseRequest: boolean;
     items: TaskBase[];
     loading?: boolean;
     onRowsUpdated?: (updatedRows: TaskBase[]) => void;
@@ -23,6 +23,8 @@ const columns: Array<{
 }> = [
     { field: "subteamId", headerName: "Subteam ID", width: 130 },
     { field: "description", headerName: "Description", width: 230 },
+    { field: "eventId", headerName: "Event ID", width: 230 },
+    { field: "taskId", headerName: "Task ID", width: 230 },
 ];
 
 export const TaskItemTable = ({
@@ -84,7 +86,7 @@ export const TaskItemTable = ({
         setSelectedRows([]);
     };
 
-    const handleGetRowId = (event: TaskBase): number => event.taskId;
+    const handleGetRowId = (task: TaskBase): number => task.taskId;
 
     return (
         <div style={{ width: "100%" }}>

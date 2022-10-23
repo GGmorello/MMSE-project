@@ -10,6 +10,8 @@ import {
     LoadingState,
     Task,
     Subteam,
+    TaskApplicationBase,
+    TaskApplication,
 } from "model";
 import { RootState } from "store/store";
 import { logoutUser } from "store/user/userSlice";
@@ -162,15 +164,41 @@ export const fetchTasks = createAsyncThunk(
             return thunkAPI.rejectWithValue("user is null");
         }
         const service: WebService = new WebService(user.access_token);
-        const response: Response<Task[]> = await service.fetchTasks();
+        const response: Response<Task[]> = await service.fetchTasks(user.role);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
-                // temp filtering since webservice hardcodes tasks
                 // eslint-disable-next-line no-case-declarations
-                const filtered: Task[] = response.data.filter((t: Task) => {
-                    return getSubteamRoles(t.subteamId).includes(user.role);
-                });
-                thunkAPI.dispatch(setTasks(filtered));
+                const mapped: Task[] = response.data.map((t: Task, i) => ({
+                    ...t,
+                    taskId: i,
+                }));
+                thunkAPI.dispatch(setTasks(mapped));
+                return mapped;
+            case ResponseType.ERROR:
+                return thunkAPI.rejectWithValue(undefined);
+            default:
+                console.log(
+                    "unexpected return type from login request: ",
+                    response,
+                );
+                return thunkAPI.rejectWithValue(undefined);
+        }
+    },
+);
+export const createTaskApplication = createAsyncThunk(
+    "event/createApplication",
+    async (newApplication: TaskApplicationBase, thunkAPI) => {
+        const state: RootState = thunkAPI.getState() as RootState;
+        const user: User | null = state.user.userData;
+        if (user === null) {
+            console.warn("user data is null - cannot save event");
+            return thunkAPI.rejectWithValue("user is null");
+        }
+        const service: WebService = new WebService(user.access_token);
+        const response: Response<TaskApplication> =
+            await service.submitTaskApplication(newApplication);
+        switch (response.type) {
+            case ResponseType.SUCCESSFUL:
                 return response.data;
             case ResponseType.ERROR:
                 return thunkAPI.rejectWithValue(undefined);
@@ -200,6 +228,8 @@ export const eventSlice = createSlice({
             .addCase(logoutUser.fulfilled, (state: EventState) => {
                 state.creating = LoadingState.IDLE;
                 state.loading = LoadingState.IDLE;
+                state.tasks = [];
+                state.events = [];
             })
             .addCase(createEvent.fulfilled, (state: EventState) => {
                 state.creating = LoadingState.SUCCEEDED;
@@ -244,6 +274,15 @@ export const eventSlice = createSlice({
                 state.loading = LoadingState.PENDING;
             })
             .addCase(fetchEvents.rejected, (state: EventState) => {
+                state.loading = LoadingState.FAILED;
+            })
+            .addCase(createTaskApplication.fulfilled, (state: EventState) => {
+                state.loading = LoadingState.SUCCEEDED;
+            })
+            .addCase(createTaskApplication.pending, (state: EventState) => {
+                state.loading = LoadingState.PENDING;
+            })
+            .addCase(createTaskApplication.rejected, (state: EventState) => {
                 state.loading = LoadingState.FAILED;
             });
     },
