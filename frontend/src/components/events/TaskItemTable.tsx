@@ -1,7 +1,9 @@
+/* eslint-disable multiline-ternary */
 import React, { useEffect, useState } from "react";
 
-import { MessageType, TaskBase } from "model";
-import { DataGrid, GridSelectionModel } from "@mui/x-data-grid";
+import { FinancialRequestStatus, MessageType, TaskBase } from "model";
+import { DataGrid, GridColumns, GridSelectionModel } from "@mui/x-data-grid";
+
 import {
     Button,
     FormControl,
@@ -10,23 +12,23 @@ import {
     Typography,
 } from "@mui/material";
 import { AppDispatch } from "store/store";
-import { submitTaskRequest } from "store/event/eventSlice";
+import {
+    submitFinancialRequest,
+    submitTaskRequest,
+} from "store/event/eventSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { addMessage } from "store/message/messageSlice";
 import { useDispatch } from "react-redux";
 
 interface TaskItemTableProps {
     canRaiseRequest?: boolean;
+    canSubmitFinancialRequests?: boolean;
     items: TaskBase[];
     loading?: boolean;
     onRowsUpdated?: (updatedRows: TaskBase[]) => void;
 }
 
-const columns: Array<{
-    field: keyof TaskBase;
-    headerName: string;
-    width: number;
-}> = [
+const columns: GridColumns<TaskBase> = [
     { field: "subteamId", headerName: "Subteam ID", width: 130 },
     { field: "description", headerName: "Description", width: 150 },
     { field: "eventId", headerName: "Event ID", width: 230 },
@@ -34,6 +36,7 @@ const columns: Array<{
 ];
 
 export const TaskItemTable = ({
+    canSubmitFinancialRequests,
     canRaiseRequest,
     items,
     loading,
@@ -45,15 +48,21 @@ export const TaskItemTable = ({
     const [selectedRows, setSelectedRows] = useState<Array<string | number>>(
         [],
     );
+    const [reviewNote, setReviewNote] = useState<string>("");
     const [taskReviewNote, setTaskReviewNote] = useState<string>("");
+
+    const editRowsEnabled: boolean = onRowsUpdated !== undefined;
+    const submitFinancialRequestEnabled: boolean =
+        canSubmitFinancialRequests !== undefined &&
+        canSubmitFinancialRequests &&
+        selectedRows.length > 0;
 
     const selectedRow: TaskBase | undefined =
         // eslint-disable-next-line multiline-ternary
         selectedRows.length > 0
-            // eslint-disable-next-line multiline-ternary
             ? rows.find((r: TaskBase) => r.taskId === selectedRows[0])
             : undefined;
-    const editRowsEnabled: boolean = onRowsUpdated !== undefined;
+
     const showRaiseRequest: boolean =
         canRaiseRequest !== undefined &&
         canRaiseRequest &&
@@ -62,6 +71,47 @@ export const TaskItemTable = ({
     useEffect(() => {
         setRows(items);
     }, [items]);
+
+    const handleSelectionChanged = (
+        selectionModel: GridSelectionModel,
+    ): void => {
+        setSelectedRows(selectionModel);
+    };
+
+    const handleSubmitFinancialRequest = (): void => {
+        dispatch(
+            submitFinancialRequest({
+                taskId: `${selectedRows[0]}`,
+                request: reviewNote,
+                status: FinancialRequestStatus.SUBMITTED,
+            }),
+        )
+            .then(unwrapResult)
+            .then((res: any) => {
+                console.log("financial request submitted", res);
+                dispatch(
+                    addMessage({
+                        type: MessageType.SUCCESS,
+                        message: "Financial request submitted",
+                    }),
+                );
+                setSelectedRows([]);
+                setReviewNote("");
+            })
+            .catch((e) => {
+                console.warn(
+                    "submitting financial request failed unexpectedly",
+                    e,
+                );
+                dispatch(
+                    addMessage({
+                        type: MessageType.ERROR,
+                        message:
+                            "Financial request submission failed - please try again",
+                    }),
+                );
+            });
+    };
 
     const handleSubmitRequest = (): void => {
         dispatch(
@@ -93,12 +143,6 @@ export const TaskItemTable = ({
             });
     };
 
-    const handleSelectionChanged = (
-        selectionModel: GridSelectionModel,
-    ): void => {
-        setSelectedRows(selectionModel);
-    };
-
     const handleRemoveRows = (): void => {
         if (onRowsUpdated === undefined) return;
         const keepRows: TaskBase[] = rows.filter(
@@ -124,9 +168,37 @@ export const TaskItemTable = ({
                     onSelectionModelChange={handleSelectionChanged}
                 />
             </div>
+            {submitFinancialRequestEnabled && (
+                <div>
+                    <Typography variant="h4">
+                        Submit a financial request
+                    </Typography>
+                    <FormControl style={{ width: "30ch", marginRight: 10 }}>
+                        <InputLabel htmlFor={"request-note-input"}>
+                            Request note
+                        </InputLabel>
+                        <OutlinedInput
+                            id="request-note-input"
+                            value={reviewNote ?? ""}
+                            label="Request note"
+                            onChange={(e) => setReviewNote(e.target.value)}
+                        />
+                    </FormControl>
+                    <Button
+                        color="warning"
+                        variant="contained"
+                        disabled={loading}
+                        onClick={handleSubmitFinancialRequest}
+                    >
+                        Submit
+                    </Button>
+                </div>
+            )}
             {selectedRow !== undefined && selectedRow.comment?.length > 0 && (
                 <div>
-                    <Typography variant="body1">Existing task request: {selectedRow.comment}</Typography>
+                    <Typography variant="body1">
+                        Existing task request: {selectedRow.comment}
+                    </Typography>
                 </div>
             )}
             {showRaiseRequest && (

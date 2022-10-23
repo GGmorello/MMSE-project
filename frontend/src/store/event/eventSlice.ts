@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import WebService from "components/common/WebService";
-import { getRoleSubteam, getSubteamRoles } from "logic/user";
+import { getRoleSubteam } from "logic/user";
 import {
     Event,
     EventBase,
@@ -9,7 +9,8 @@ import {
     ResponseType,
     LoadingState,
     Task,
-    Subteam,
+    FinancialRequest,
+    FinancialRequestBase,
     TaskApplicationBase,
     TaskApplication,
 } from "model";
@@ -71,7 +72,11 @@ export const submitTaskRequest = createAsyncThunk(
             return thunkAPI.rejectWithValue("user is null");
         }
         const service: WebService = new WebService(user.access_token);
-        const response: Response<Task[]> = await service.submitTaskRequest(taskId, user.role, request);
+        const response: Response<Task[]> = await service.submitTaskRequest(
+            taskId,
+            user.role,
+            request,
+        );
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 // eslint-disable-next-line no-case-declarations
@@ -169,7 +174,8 @@ export const fetchTasks = createAsyncThunk(
             return thunkAPI.rejectWithValue("user is null");
         }
         const service: WebService = new WebService(user.access_token);
-        const response: Response<Task[]> = await service.fetchTasks(user.role);
+        const subteam = getRoleSubteam(user.role);
+        const response: Response<Task[]> = await service.fetchTasks(subteam ?? user.role);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 // eslint-disable-next-line no-case-declarations
@@ -179,6 +185,37 @@ export const fetchTasks = createAsyncThunk(
                 }));
                 thunkAPI.dispatch(setTasks(mapped));
                 return mapped;
+            case ResponseType.ERROR:
+                return thunkAPI.rejectWithValue(undefined);
+            default:
+                console.log(
+                    "unexpected return type from login request: ",
+                    response,
+                );
+                return thunkAPI.rejectWithValue(undefined);
+        }
+    },
+);
+
+export const submitFinancialRequest = createAsyncThunk(
+    "event/financialRequest",
+    async (req: FinancialRequestBase, thunkAPI) => {
+        const state: RootState = thunkAPI.getState() as RootState;
+        const user: User | null = state.user.userData;
+        if (user === null) {
+            console.warn("user data is null - cannot fetch tasks");
+            return thunkAPI.rejectWithValue("user is null");
+        }
+        const service: WebService = new WebService(user.access_token);
+        const response: Response<FinancialRequest> =
+            await service.submitFinancialRequest(
+                req.taskId,
+                user.role,
+                req.request,
+            );
+        switch (response.type) {
+            case ResponseType.SUCCESSFUL:
+                return response.data;
             case ResponseType.ERROR:
                 return thunkAPI.rejectWithValue(undefined);
             default:
@@ -243,6 +280,15 @@ export const eventSlice = createSlice({
                 state.creating = LoadingState.PENDING;
             })
             .addCase(createEvent.rejected, (state: EventState) => {
+                state.creating = LoadingState.FAILED;
+            })
+            .addCase(submitFinancialRequest.fulfilled, (state: EventState) => {
+                state.creating = LoadingState.SUCCEEDED;
+            })
+            .addCase(submitFinancialRequest.pending, (state: EventState) => {
+                state.creating = LoadingState.PENDING;
+            })
+            .addCase(submitFinancialRequest.rejected, (state: EventState) => {
                 state.creating = LoadingState.FAILED;
             })
             .addCase(submitTaskRequest.fulfilled, (state: EventState) => {

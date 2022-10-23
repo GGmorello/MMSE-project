@@ -1,4 +1,4 @@
-import { Subteam, Role } from "model";
+import { Role, Subteam } from "model";
 
 export interface EventRequestItem {
     requestId: number;
