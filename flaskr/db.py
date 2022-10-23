@@ -1,6 +1,6 @@
 import sqlite3
 import click
-
+import os
 from flask import current_app, g
 from sqlite3 import Error
 
@@ -41,7 +41,9 @@ def init_app(app):
 
 def main():
     conn = create_connection()
-    with open('schema.sql') as f:
+    file_path = os.path.realpath(__file__)
+
+    with open(file_path + '/schema.sql') as f:
         conn.executescript(f.read())
 
 def create_connection():
