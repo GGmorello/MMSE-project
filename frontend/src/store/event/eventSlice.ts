@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import WebService from "components/common/WebService";
-import { getSubteamRoles } from "logic/user";
+import { getRoleSubteam, getSubteamRoles } from "logic/user";
 import {
     Event,
     EventBase,
@@ -9,6 +9,7 @@ import {
     ResponseType,
     LoadingState,
     Task,
+    Subteam,
     TaskApplicationBase,
     TaskApplication,
 } from "model";
@@ -43,6 +44,43 @@ export const createEvent = createAsyncThunk(
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 return response.data;
+            case ResponseType.ERROR:
+                return thunkAPI.rejectWithValue(undefined);
+            default:
+                console.log(
+                    "unexpected return type from login request: ",
+                    response,
+                );
+                return thunkAPI.rejectWithValue(undefined);
+        }
+    },
+);
+
+interface TaskRequest {
+    taskId: string;
+    request: string;
+}
+
+export const submitTaskRequest = createAsyncThunk(
+    "event/task/request",
+    async ({ taskId, request }: TaskRequest, thunkAPI) => {
+        const state: RootState = thunkAPI.getState() as RootState;
+        const user: User | null = state.user.userData;
+        if (user === null) {
+            console.warn("user data is null - cannot save event");
+            return thunkAPI.rejectWithValue("user is null");
+        }
+        const service: WebService = new WebService(user.access_token);
+        const response: Response<Task[]> = await service.submitTaskRequest(taskId, user.role, request);
+        switch (response.type) {
+            case ResponseType.SUCCESSFUL:
+                // eslint-disable-next-line no-case-declarations
+                const mapped: Task[] = response.data.map((t: Task) => ({
+                    ...t,
+                    taskId: t.id,
+                }));
+                thunkAPI.dispatch(setTasks(mapped));
+                return mapped;
             case ResponseType.ERROR:
                 return thunkAPI.rejectWithValue(undefined);
             default:
@@ -135,9 +173,9 @@ export const fetchTasks = createAsyncThunk(
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 // eslint-disable-next-line no-case-declarations
-                const mapped: Task[] = response.data.map((t: Task, i) => ({
+                const mapped: Task[] = response.data.map((t: Task) => ({
                     ...t,
-                    taskId: i,
+                    taskId: t.id,
                 }));
                 thunkAPI.dispatch(setTasks(mapped));
                 return mapped;
@@ -205,6 +243,15 @@ export const eventSlice = createSlice({
                 state.creating = LoadingState.PENDING;
             })
             .addCase(createEvent.rejected, (state: EventState) => {
+                state.creating = LoadingState.FAILED;
+            })
+            .addCase(submitTaskRequest.fulfilled, (state: EventState) => {
+                state.creating = LoadingState.SUCCEEDED;
+            })
+            .addCase(submitTaskRequest.pending, (state: EventState) => {
+                state.creating = LoadingState.PENDING;
+            })
+            .addCase(submitTaskRequest.rejected, (state: EventState) => {
                 state.creating = LoadingState.FAILED;
             })
             .addCase(updateEventStatus.fulfilled, (state: EventState) => {

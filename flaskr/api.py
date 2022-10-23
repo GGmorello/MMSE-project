@@ -179,17 +179,18 @@ def getFinancialRequests():
 @cross_origin()
 def get_tasks():
     user, db = init(request)
+    cursor = db.cursor()
     if user is None:
         return Response("Invalid user", status=400)
 
     elif request.method == 'POST':
-        db.cursor().execute(
-            'UPDATE tasks SET comment = ? WHERE subteamId = ? AND eventId = ? AND id = ?',
-            (request.json['comment'], request.args['subteamId'], request.args['eventId'], request.args["taskId"])
+        cursor.execute(
+            'UPDATE tasks SET comment = ? WHERE id = ?',
+            (request.json['comment'], request.json['taskId'])
         )
         db.commit()
 
-    tasks = db.cursor().execute(
+    tasks = cursor.execute(
         'SELECT * FROM tasks WHERE subteamId = ?', (request.args['subteamId'],)
     ).fetchall()
 

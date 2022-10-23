@@ -15,6 +15,7 @@ import {
     Role,
     FinancialRequest,
     HiringRequest,
+    Subteam,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -52,6 +53,23 @@ class WebService {
             .get<Event[]>("event")
             .then((res: AxiosResponse<Event[]>) => {
                 const resp: SuccessResponse<Event[]> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async submitTaskRequest(
+        taskId: string,
+        subteamId: string,
+        request: string,
+    ): Promise<Response<Task[]>> {
+        return await this.instance
+            .post<Task[]>("event/tasks?subteamId=" + subteamId, { taskId, comment: request })
+            .then((res: AxiosResponse<Task[]>) => {
+                const resp: SuccessResponse<Task[]> = {
                     type: ResponseType.SUCCESSFUL,
                     data: res.data,
                 };

@@ -35,8 +35,8 @@ export enum Role {
 }
 
 export enum Subteam {
-    CHEFS = "CHEF_SUBTEAM",
-    AUDIO_SPECIALIST = "AUDIO_SPECIALISTS_SUBTEAM",
+    CHEFS = "TOP_CHEF",
+    AUDIO_SPECIALIST = "AUDIO_SPECIALIST",
 }
 
 export const AUDIO_SUBTEAM: Role[] = [Role.AUDIO_SPECIALIST];
