@@ -131,6 +131,25 @@ def approve():
     event['eventRequestItems'] = eval(event['eventRequestItems'])
     return event
 
+@bp.route("/request", methods=['PUT'])
+@cross_origin()
+def financialRequest():
+    user, db = init(request)
+
+    if user is None:
+        return Response("Invalid user", status=400)
+    
+    role = user['role']
+
+    if (role != "SERVICE_MANAGER" and role != "PRODUCTION_MANAGER"):
+        return Response("Unauthorized", 403)
+    cur = db.cursor()
+    cur.execute('INSERT INTO financial_request (requestor, request, taskId, status) VALUES (?,?,?,?)',
+                (request.json['requestor'], request.json['request'], request.json['taskId'], "SUBMITTED"))
+    db.commit()
+    id = cur.lastrowid
+    financial_request = cur.execute('SELECT * FROM financial_request WHERE id = ?', (id,)).fetchone()
+    return financial_request
 
 @bp.route("/application", methods=['POST'])
 @cross_origin()
@@ -152,7 +171,6 @@ def application():
         return task
     return Response("Unauthorized", 403)
     
-    
 @bp.route("/requests", methods=['GET'])
 @cross_origin()
 def getFinancialRequests():    
@@ -172,8 +190,6 @@ def getFinancialRequests():
         return Response("Unauthorized", 403)
 
     return requests
-
-
 
 @bp.route("/tasks", methods=['GET', 'POST'])
 @cross_origin()
@@ -195,7 +211,6 @@ def get_tasks():
     ).fetchall()
 
     return tasks
-
 
 @bp.route("/request/approve", methods=['PUT'])
 @cross_origin()

@@ -67,7 +67,10 @@ class WebService {
         request: string,
     ): Promise<Response<Task[]>> {
         return await this.instance
-            .post<Task[]>("event/tasks?subteamId=" + subteamId, { taskId, comment: request })
+            .post<Task[]>("event/tasks?subteamId=" + subteamId, {
+                taskId,
+                comment: request,
+            })
             .then((res: AxiosResponse<Task[]>) => {
                 const resp: SuccessResponse<Task[]> = {
                     type: ResponseType.SUCCESSFUL,
@@ -164,6 +167,27 @@ class WebService {
             .put<Event>("event/approve", { id, approved, reviewNotes })
             .then((res: AxiosResponse<Event>) => {
                 const resp: SuccessResponse<Event> = {
+                    type: ResponseType.SUCCESSFUL,
+                    data: res.data,
+                };
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
+    }
+
+    async submitFinancialRequest(
+        taskId: string,
+        requestor: Role,
+        request: string,
+    ): Promise<Response<FinancialRequest>> {
+        return await this.instance
+            .put<FinancialRequest>("event/request", {
+                taskId,
+                requestor,
+                request,
+            })
+            .then((res: AxiosResponse<FinancialRequest>) => {
+                const resp: SuccessResponse<FinancialRequest> = {
                     type: ResponseType.SUCCESSFUL,
                     data: res.data,
                 };
