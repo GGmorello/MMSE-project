@@ -1,0 +1,434 @@
+{
+	"info": {
+		"_postman_id": "3de5972f-2dbf-490f-9832-6ab8375adb8f",
+		"name": "MMSE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8494952"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"{{USERNAME}}\",\r\n    \"password\": \"{{PASSWORD}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}auth/login",
+					"host": [
+						"{{APP_URL}}auth"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Event",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clientId\": \"client444\",\r\n    \"startDate\": \"2022-10-10T10:00:00Z\",\r\n    \"endDate\": \"2022-10-10T10:00:00Z\",\r\n    \"eventRequestItems\": [\r\n        {\r\n            \"requestId\": 1,\r\n            \"description\": \"testing 123\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}event/create",
+					"host": [
+						"{{APP_URL}}event"
+					],
+					"path": [
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit Task Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"taskId\": \"testing\",\r\n    \"comment\": \"please cook some nice food\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}event/tasks?subteamId=TOP_CHEF",
+					"host": [
+						"{{APP_URL}}event"
+					],
+					"path": [
+						"tasks"
+					],
+					"query": [
+						{
+							"key": "subteamId",
+							"value": "TOP_CHEF"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit Task Application",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventId\": \"event123\",\r\n    \"tasks\": [\r\n        {\r\n            \"taskId\": \"task-1\",\r\n            \"eventId\": \"event123\",\r\n            \"subteamId\": \"TOP_CHEF\",\r\n            \"description\": \"please make some nice steaks\",\r\n            \"comment\": null\r\n        },\r\n        {\r\n            \"taskId\": \"task-2\",\r\n            \"eventId\": \"event123\",\r\n            \"subteamId\": \"AUDIO_SPECIALIST\",\r\n            \"description\": \"big boom sound pls\",\r\n            \"comment\": null\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}event/application",
+					"host": [
+						"{{APP_URL}}event"
+					],
+					"path": [
+						"application"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit Financial Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"taskId\": \"testing\",\r\n    \"requestor\": \"PRODUCTION_MANAGER\",\r\n    \"request\": \"please hire more audio specialists\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}event/request",
+					"host": [
+						"{{APP_URL}}event"
+					],
+					"path": [
+						"request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit Hiring Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"subteamId\": \"TOP_CHEF\",\r\n    \"role\": \"TOP_CHEF\",\r\n    \"comment\": \"the current head chef has been drinking on the job, we need a new one\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}user/hire",
+					"host": [
+						"{{APP_URL}}user"
+					],
+					"path": [
+						"hire"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Events",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}event",
+					"host": [
+						"{{APP_URL}}event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Tasks",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}event/tasks?subteamId=TOP_CHEF",
+					"host": [
+						"{{APP_URL}}event"
+					],
+					"path": [
+						"tasks"
+					],
+					"query": [
+						{
+							"key": "subteamId",
+							"value": "TOP_CHEF"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Financial Requests",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clientId\": \"client\",\r\n    \"startDate\": \"2022-10-10T10:00:00Z\",\r\n    \"endDate\": \"2022-10-10T10:00:00Z\",\r\n    \"eventRequestItems\": [\r\n        {\r\n            \"requestId\": 1,\r\n            \"description\": \"more flowers pls\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}event/requests",
+					"host": [
+						"{{APP_URL}}event"
+					],
+					"path": [
+						"requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Hiring Requests",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clientId\": \"client\",\r\n    \"startDate\": \"2022-10-10T10:00:00Z\",\r\n    \"endDate\": \"2022-10-10T10:00:00Z\",\r\n    \"eventRequestItems\": [\r\n        {\r\n            \"requestId\": 1,\r\n            \"description\": \"more flowers pls\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}user/hire",
+					"host": [
+						"{{APP_URL}}user"
+					],
+					"path": [
+						"hire"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Approve Event",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"SEWK83B6Z057TPT03UP3K7E6\",\r\n    \"comment\": \"This sounds reasonable to me - lets schedule a meeting\",\r\n    \"approved\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}event/approve",
+					"host": [
+						"{{APP_URL}}event"
+					],
+					"path": [
+						"approve"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Approve Financial Request",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"approved\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}event/request/approve",
+					"host": [
+						"{{APP_URL}}event"
+					],
+					"path": [
+						"request",
+						"approve"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Approve Hiring Request",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"approved\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{APP_URL}}users/hire/approve",
+					"host": [
+						"{{APP_URL}}users"
+					],
+					"path": [
+						"hire",
+						"approve"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{TOKEN}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "Authorization",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const USERNAME = pm.environment.get(\"USERNAME\");",
+					"const PASSWORD = pm.environment.get(\"PASSWORD\");",
+					"const APP_URL = pm.collectionVariables.get(\"APP_URL\");",
+					"",
+					"const postRequest = {",
+					"    url: APP_URL + \"auth/login\",",
+					"    method: \"POST\",",
+					"    header: {",
+					"        \"Content-Type\" : \"application/json\",",
+					"    },",
+					"    body: JSON.stringify({",
+					"        \"username\": USERNAME,",
+					"        \"password\": PASSWORD",
+					"    })",
+					"};",
+					"",
+					"pm.sendRequest(postRequest, (err, response) => {",
+					"    const resJson = response.json();",
+					"    const token = resJson.access_token;",
+					"    console.log(token);",
+					"    pm.environment.set(\"TOKEN\", token);",
+					"});"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "APP_URL",
+			"value": "http://localhost:5000/",
+			"type": "string"
+		}
+	]
+}
