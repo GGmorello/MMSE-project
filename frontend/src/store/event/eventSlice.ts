@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import WebService from "components/common/WebService";
-import { getSubteamDepartmenRoles, getSubteamRoles } from "logic/user";
 import {
     Event,
     EventBase,
@@ -11,6 +10,8 @@ import {
     Task,
     FinancialRequest,
     FinancialRequestBase,
+    TaskApplicationBase,
+    TaskApplication,
 } from "model";
 import { RootState } from "store/store";
 import { logoutUser } from "store/user/userSlice";
@@ -43,6 +44,47 @@ export const createEvent = createAsyncThunk(
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 return response.data;
+            case ResponseType.ERROR:
+                return thunkAPI.rejectWithValue(undefined);
+            default:
+                console.log(
+                    "unexpected return type from login request: ",
+                    response,
+                );
+                return thunkAPI.rejectWithValue(undefined);
+        }
+    },
+);
+
+interface TaskRequest {
+    taskId: string;
+    request: string;
+}
+
+export const submitTaskRequest = createAsyncThunk(
+    "event/task/request",
+    async ({ taskId, request }: TaskRequest, thunkAPI) => {
+        const state: RootState = thunkAPI.getState() as RootState;
+        const user: User | null = state.user.userData;
+        if (user === null) {
+            console.warn("user data is null - cannot save event");
+            return thunkAPI.rejectWithValue("user is null");
+        }
+        const service: WebService = new WebService(user.access_token);
+        const response: Response<Task[]> = await service.submitTaskRequest(
+            taskId,
+            user.role,
+            request,
+        );
+        switch (response.type) {
+            case ResponseType.SUCCESSFUL:
+                // eslint-disable-next-line no-case-declarations
+                const mapped: Task[] = response.data.map((t: Task) => ({
+                    ...t,
+                    taskId: t.id,
+                }));
+                thunkAPI.dispatch(setTasks(mapped));
+                return mapped;
             case ResponseType.ERROR:
                 return thunkAPI.rejectWithValue(undefined);
             default:
@@ -131,16 +173,16 @@ export const fetchTasks = createAsyncThunk(
             return thunkAPI.rejectWithValue("user is null");
         }
         const service: WebService = new WebService(user.access_token);
-        const response: Response<Task[]> = await service.fetchTasks();
+        const response: Response<Task[]> = await service.fetchTasks(user.role);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
-                // temp filtering since webservice hardcodes tasks
                 // eslint-disable-next-line no-case-declarations
-                const filtered: Task[] = response.data.filter((t: Task) => {
-                    return getSubteamDepartmenRoles(t.subteamId).includes(user.role);
-                });
-                thunkAPI.dispatch(setTasks(filtered));
-                return response.data;
+                const mapped: Task[] = response.data.map((t: Task) => ({
+                    ...t,
+                    taskId: t.id,
+                }));
+                thunkAPI.dispatch(setTasks(mapped));
+                return mapped;
             case ResponseType.ERROR:
                 return thunkAPI.rejectWithValue(undefined);
             default:
@@ -163,7 +205,38 @@ export const submitFinancialRequest = createAsyncThunk(
             return thunkAPI.rejectWithValue("user is null");
         }
         const service: WebService = new WebService(user.access_token);
-        const response: Response<FinancialRequest> = await service.submitFinancialRequest(req.taskId, user.role, req.taskId);
+        const response: Response<FinancialRequest> =
+            await service.submitFinancialRequest(
+                req.taskId,
+                user.role,
+                req.request,
+            );
+        switch (response.type) {
+            case ResponseType.SUCCESSFUL:
+                return response.data;
+            case ResponseType.ERROR:
+                return thunkAPI.rejectWithValue(undefined);
+            default:
+                console.log(
+                    "unexpected return type from login request: ",
+                    response,
+                );
+                return thunkAPI.rejectWithValue(undefined);
+        }
+    },
+);
+export const createTaskApplication = createAsyncThunk(
+    "event/createApplication",
+    async (newApplication: TaskApplicationBase, thunkAPI) => {
+        const state: RootState = thunkAPI.getState() as RootState;
+        const user: User | null = state.user.userData;
+        if (user === null) {
+            console.warn("user data is null - cannot save event");
+            return thunkAPI.rejectWithValue("user is null");
+        }
+        const service: WebService = new WebService(user.access_token);
+        const response: Response<TaskApplication> =
+            await service.submitTaskApplication(newApplication);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 return response.data;
@@ -216,6 +289,15 @@ export const eventSlice = createSlice({
             .addCase(submitFinancialRequest.rejected, (state: EventState) => {
                 state.creating = LoadingState.FAILED;
             })
+            .addCase(submitTaskRequest.fulfilled, (state: EventState) => {
+                state.creating = LoadingState.SUCCEEDED;
+            })
+            .addCase(submitTaskRequest.pending, (state: EventState) => {
+                state.creating = LoadingState.PENDING;
+            })
+            .addCase(submitTaskRequest.rejected, (state: EventState) => {
+                state.creating = LoadingState.FAILED;
+            })
             .addCase(updateEventStatus.fulfilled, (state: EventState) => {
                 state.loading = LoadingState.SUCCEEDED;
             })
@@ -241,6 +323,15 @@ export const eventSlice = createSlice({
                 state.loading = LoadingState.PENDING;
             })
             .addCase(fetchEvents.rejected, (state: EventState) => {
+                state.loading = LoadingState.FAILED;
+            })
+            .addCase(createTaskApplication.fulfilled, (state: EventState) => {
+                state.loading = LoadingState.SUCCEEDED;
+            })
+            .addCase(createTaskApplication.pending, (state: EventState) => {
+                state.loading = LoadingState.PENDING;
+            })
+            .addCase(createTaskApplication.rejected, (state: EventState) => {
                 state.loading = LoadingState.FAILED;
             });
     },

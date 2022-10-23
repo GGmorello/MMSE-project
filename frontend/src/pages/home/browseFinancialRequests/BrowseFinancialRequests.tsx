@@ -1,36 +1,39 @@
 import { Typography } from "@mui/material";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { TaskItemTable } from "components/events/TaskItemTable";
-import { canSubmitFinancialRequests } from "logic/user";
-import { LoadingState, User } from "model";
-import { MessageType } from "model/message";
+import { FinancialRequestTable } from "components/user/FinancialRequestTable";
+import { canReviewFinancialRequests } from "logic/user";
+import { FinancialRequest, MessageType, User } from "model";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTasks } from "store/event/eventSlice";
 import { addMessage } from "store/message/messageSlice";
 import { AppDispatch, RootState } from "store/store";
+import { fetchFinancialRequests } from "store/user/userSlice";
 
-export const BrowseTeamTasks = (): JSX.Element => {
+export const BrowseFinancialRequests = (): JSX.Element => {
     const dispatch: AppDispatch = useDispatch();
+
     const user: User | null = useSelector((state: RootState) => state.user.userData);
-    const tasks = useSelector((state: RootState) => state.event.tasks);
 
-    const loadingState: LoadingState = useSelector((state: RootState) => state.event.loading);
-    const creatingState: LoadingState = useSelector((state: RootState) => state.event.creating);
-    const loading = loadingState === LoadingState.PENDING || creatingState === LoadingState.PENDING;
+    const requests: FinancialRequest[] = useSelector(
+        (state: RootState) => state.user.financialRequests,
+    );
 
-    const submitFinancialRequestsEnabled: boolean = user !== null && canSubmitFinancialRequests(user.role);
+    const canReview: boolean = user !== null && canReviewFinancialRequests(user.role);
 
     useEffect(() => {
-        dispatch(fetchTasks(""))
+        dispatch(fetchFinancialRequests(""))
             .then(unwrapResult)
             .then(() => {})
             .catch((e) => {
-                console.warn("Task loading failed unexpectedly", e);
+                console.warn(
+                    "fetching financial requests failed unexpectedly",
+                    e,
+                );
                 dispatch(
                     addMessage({
                         type: MessageType.ERROR,
-                        message: "Failed to load tasks",
+                        message:
+                            "fetching financial requests failed unexpectedly",
                     }),
                 );
             });
@@ -56,8 +59,10 @@ export const BrowseTeamTasks = (): JSX.Element => {
                         paddingLeft: 40,
                     }}
                 >
-                    <Typography variant="h3">Browse Team Tasks</Typography>
-                    <TaskItemTable canRaiseRequest canSubmitFinancialRequests={submitFinancialRequestsEnabled} items={tasks} loading={loading} />
+                    <Typography variant="h3">
+                        Browse Financial Requests
+                    </Typography>
+                    <FinancialRequestTable canReviewRequests={canReview} items={requests} />
                 </div>
             </div>
         </div>

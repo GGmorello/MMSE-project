@@ -9,6 +9,7 @@ export enum EventStatus {
     APPROVED_BY_ADM = "APPROVED_BY_ADM",
     APPROVED_BY_FM = "APPROVED_BY_FM",
     APPROVED_BY_SCSO = "APPROVED_BY_SCSO",
+    IN_PROGRESS = "IN_PROGRESS",
     NEW = "NEW",
     REJECTED_BY_ADM = "REJECTED_BY_ADM",
     REJECTED_BY_FM = "REJECTED_BY_FM",
@@ -39,27 +40,27 @@ export interface TaskApplication extends TaskApplicationBase {
 }
 
 export interface TaskBase {
-    taskId: number;
+    taskId: number | string;
     eventId: string;
     subteamId: Subteam;
     description: string;
-    taskRequest: TaskRequest | null;
-}
-
-export interface TaskRequest {
-    taskId: string;
-    subteam: Subteam | null;
-    role: Role;
-    request: string;
+    comment: string;
 }
 
 export interface Task extends TaskBase {
     id: string;
 }
 
+export enum FinancialRequestStatus {
+    APPROVED = "APPROVED",
+    REJECTED = "REJECTED",
+    SUBMITTED = "SUBMITTED",
+}
+
 export interface FinancialRequestBase {
     taskId: string;
     request: string;
+    status: FinancialRequestStatus;
 }
 
 export interface FinancialRequest extends FinancialRequestBase {
