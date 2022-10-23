@@ -145,7 +145,7 @@ def financialRequest():
         return Response("Unauthorized", 403)
     cur = db.cursor()
     cur.execute('INSERT INTO financial_request (requestor, request, taskId, status) VALUES (?,?,?,?)',
-                (request.json['requestor'], request.json['taskId'], request.json['taskId'], "SUBMITTED"))
+                (request.json['requestor'], request.json['request'], request.json['taskId'], "SUBMITTED"))
     db.commit()
     id = cur.lastrowid
     financial_request = cur.execute('SELECT * FROM financial_request WHERE id = ?', (id,)).fetchone()

@@ -26,8 +26,8 @@ interface FinancialRequestTableProps {
 
 const columns: GridColumns<FinancialRequest> = [
     { field: "id", headerName: "ID", width: 120 },
-    { field: "taskId", headerName: "Task ID", width: 120 },
-    { field: "request", headerName: "Request", width: 120 },
+    { field: "taskId", headerName: "Task ID", width: 230 },
+    { field: "request", headerName: "Request", width: 230 },
     {
         field: "status",
         headerName: "Status",

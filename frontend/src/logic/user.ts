@@ -5,6 +5,8 @@ import {
     PRODUCTION_DEPARTMENT_SUBTEAMS,
     SERVICE_DEPARTMENT_SUBTEAMS,
     HiringRequestStatus,
+    SERVICE_DEPARTMENT_ROLES,
+    PRODUCTION_DEPARTMENT_ROLES,
 } from "model";
 
 export function canEditEvents(role: Role): boolean {
@@ -51,8 +53,8 @@ export function getSubteamRoles(subteam: Subteam): Role[] {
 
 export function getRoleSubteam(role: Role): Subteam | null {
     // currently hardcoded to chef and audio specialist subteams
-    const isServiceSubteam: boolean = SERVICE_DEPARTMENT_SUBTEAMS.some((subTeam: Role[]) => subTeam.includes(role));
-    const isProductionSubteam: boolean = PRODUCTION_DEPARTMENT_SUBTEAMS.some((subTeam: Role[]) => subTeam.includes(role));
+    const isServiceSubteam: boolean = SERVICE_DEPARTMENT_ROLES.includes(role);
+    const isProductionSubteam: boolean = PRODUCTION_DEPARTMENT_ROLES.includes(role);
     switch (true) {
         case isServiceSubteam:
             return Subteam.CHEFS;

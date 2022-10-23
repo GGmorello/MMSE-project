@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import WebService from "components/common/WebService";
+import { getRoleSubteam } from "logic/user";
 import {
     Event,
     EventBase,
@@ -173,7 +174,8 @@ export const fetchTasks = createAsyncThunk(
             return thunkAPI.rejectWithValue("user is null");
         }
         const service: WebService = new WebService(user.access_token);
-        const response: Response<Task[]> = await service.fetchTasks(user.role);
+        const subteam = getRoleSubteam(user.role);
+        const response: Response<Task[]> = await service.fetchTasks(subteam ?? user.role);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 // eslint-disable-next-line no-case-declarations
