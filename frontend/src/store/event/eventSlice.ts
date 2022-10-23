@@ -70,12 +70,17 @@ export const submitTaskRequest = createAsyncThunk(
             console.warn("user data is null - cannot save event");
             return thunkAPI.rejectWithValue("user is null");
         }
-        const subteam: Subteam | null = getRoleSubteam(user.role);
         const service: WebService = new WebService(user.access_token);
-        const response: Response<any> = await service.submitTaskRequest(taskId, subteam, user.role, request);
+        const response: Response<Task[]> = await service.submitTaskRequest(taskId, user.role, request);
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
-                return response.data;
+                // eslint-disable-next-line no-case-declarations
+                const mapped: Task[] = response.data.map((t: Task) => ({
+                    ...t,
+                    taskId: t.id,
+                }));
+                thunkAPI.dispatch(setTasks(mapped));
+                return mapped;
             case ResponseType.ERROR:
                 return thunkAPI.rejectWithValue(undefined);
             default:
@@ -168,9 +173,9 @@ export const fetchTasks = createAsyncThunk(
         switch (response.type) {
             case ResponseType.SUCCESSFUL:
                 // eslint-disable-next-line no-case-declarations
-                const mapped: Task[] = response.data.map((t: Task, i) => ({
+                const mapped: Task[] = response.data.map((t: Task) => ({
                     ...t,
-                    taskId: i,
+                    taskId: t.id,
                 }));
                 thunkAPI.dispatch(setTasks(mapped));
                 return mapped;

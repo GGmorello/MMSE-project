@@ -15,6 +15,7 @@ import {
     Role,
     FinancialRequest,
     HiringRequest,
+    Subteam,
 } from "model";
 
 const APP_BASE_URL = "http://localhost:5000/";
@@ -60,24 +61,23 @@ class WebService {
             .catch(this.createDefaultErrorResponse);
     }
 
-    async submitTaskRequest(taskId: string, subteam: Subteam | null, role: Role, request: string): Promise<Response<any>> {
-        return await new Promise((resolve) => {
-            setTimeout(() => {
-                const data: { [key: string]: any } = {
-                    taskId,
-                    subteam,
-                    role,
-                    request,
-                };
-                const mockResponse: Response<any> = {
+    async submitTaskRequest(
+        taskId: string,
+        subteamId: string,
+        request: string,
+    ): Promise<Response<Task[]>> {
+        return await this.instance
+            .post<Task[]>("event/tasks?subteamId=" + subteamId, { taskId, comment: request })
+            .then((res: AxiosResponse<Task[]>) => {
+                const resp: SuccessResponse<Task[]> = {
                     type: ResponseType.SUCCESSFUL,
-                    data,
+                    data: res.data,
                 };
-                resolve(mockResponse);
-            }, 3000);
-        });
+                return resp;
+            })
+            .catch(this.createDefaultErrorResponse);
     }
-    
+
     async fetchHiringRequests(): Promise<Response<HiringRequest[]>> {
         return await this.instance
             .get<HiringRequest[]>("user/hire")

@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 
 import { MessageType, TaskBase } from "model";
 import { DataGrid, GridSelectionModel } from "@mui/x-data-grid";
-import { Button, FormControl, InputLabel, OutlinedInput } from "@mui/material";
+import {
+    Button,
+    FormControl,
+    InputLabel,
+    OutlinedInput,
+    Typography,
+} from "@mui/material";
 import { AppDispatch } from "store/store";
 import { submitTaskRequest } from "store/event/eventSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
@@ -10,7 +16,7 @@ import { addMessage } from "store/message/messageSlice";
 import { useDispatch } from "react-redux";
 
 interface TaskItemTableProps {
-    canRaiseRequest: boolean;
+    canRaiseRequest?: boolean;
     items: TaskBase[];
     loading?: boolean;
     onRowsUpdated?: (updatedRows: TaskBase[]) => void;
@@ -22,7 +28,7 @@ const columns: Array<{
     width: number;
 }> = [
     { field: "subteamId", headerName: "Subteam ID", width: 130 },
-    { field: "description", headerName: "Description", width: 230 },
+    { field: "description", headerName: "Description", width: 150 },
     { field: "eventId", headerName: "Event ID", width: 230 },
     { field: "taskId", headerName: "Task ID", width: 230 },
 ];
@@ -41,6 +47,12 @@ export const TaskItemTable = ({
     );
     const [taskReviewNote, setTaskReviewNote] = useState<string>("");
 
+    const selectedRow: TaskBase | undefined =
+        // eslint-disable-next-line multiline-ternary
+        selectedRows.length > 0
+            // eslint-disable-next-line multiline-ternary
+            ? rows.find((r: TaskBase) => r.taskId === selectedRows[0])
+            : undefined;
     const editRowsEnabled: boolean = onRowsUpdated !== undefined;
     const showRaiseRequest: boolean =
         canRaiseRequest !== undefined &&
@@ -52,22 +64,32 @@ export const TaskItemTable = ({
     }, [items]);
 
     const handleSubmitRequest = (): void => {
-        dispatch(submitTaskRequest({ taskId: `${selectedRows[0]}`, request: taskReviewNote }))
+        dispatch(
+            submitTaskRequest({
+                taskId: `${selectedRows[0]}`,
+                request: taskReviewNote,
+            }),
+        )
             .then(unwrapResult)
             .then((res: any) => {
                 console.log(res);
-                dispatch(addMessage({
-                    type: MessageType.SUCCESS,
-                    message: "Task request submitted successfully",
-                }));
+                dispatch(
+                    addMessage({
+                        type: MessageType.SUCCESS,
+                        message: "Task request submitted successfully",
+                    }),
+                );
                 setTaskReviewNote("");
                 setSelectedRows([]);
             })
             .catch(() => {
-                dispatch(addMessage({
-                    type: MessageType.ERROR,
-                    message: "Something went wrong when submitting task request - please try again",
-                }));
+                dispatch(
+                    addMessage({
+                        type: MessageType.ERROR,
+                        message:
+                            "Something went wrong when submitting task request - please try again",
+                    }),
+                );
             });
     };
 
@@ -86,7 +108,7 @@ export const TaskItemTable = ({
         setSelectedRows([]);
     };
 
-    const handleGetRowId = (task: TaskBase): number => task.taskId;
+    const handleGetRowId = (task: TaskBase): number | string => task.taskId;
 
     return (
         <div style={{ width: "100%" }}>
@@ -102,6 +124,11 @@ export const TaskItemTable = ({
                     onSelectionModelChange={handleSelectionChanged}
                 />
             </div>
+            {selectedRow !== undefined && selectedRow.comment?.length > 0 && (
+                <div>
+                    <Typography variant="body1">Existing task request: {selectedRow.comment}</Typography>
+                </div>
+            )}
             {showRaiseRequest && (
                 <div style={{ marginTop: 20 }}>
                     <FormControl style={{ width: "30ch" }}>

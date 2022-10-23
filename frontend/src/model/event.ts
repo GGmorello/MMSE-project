@@ -40,10 +40,11 @@ export interface TaskApplication extends TaskApplicationBase {
 }
 
 export interface TaskBase {
-    taskId: number;
+    taskId: number | string;
     eventId: string;
     subteamId: Subteam;
     description: string;
+    comment: string;
 }
 
 export interface Task extends TaskBase {
